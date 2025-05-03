@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   user_id: {
-    type: String,
-    required: true,
+    type: Number,
     unique: true,
   },
   name: {
@@ -29,7 +28,12 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre("save", function (next) {
+// Pre-save hook to handle user_id increment
+userSchema.pre("save", async function (next) {
+  if (this.isNew) {
+    const lastUser = await User.findOne().sort({ user_id: -1 });
+    this.user_id = lastUser ? lastUser.user_id + 1 : 1;
+  }
   this.updated_at = Date.now();
   next();
 });
