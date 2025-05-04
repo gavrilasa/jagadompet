@@ -3,12 +3,14 @@ import './view.css';
 import sukses from '../images/success.png';
 import { useNavigate } from 'react-router-dom';
 
+
 const ViewPage = () => {
     const [visible, setVisible] = useState(false);
+     const token = localStorage.getItem('token');
     const navigate = useNavigate();
     const handleLogin = (e) => {
         e.preventDefault(); // mencegah reload halaman
-        navigate('/home'); 
+        navigate('/dash'); 
       };
 
     useEffect(() => {
@@ -16,7 +18,17 @@ const ViewPage = () => {
         return () => clearTimeout(timer);
     }, []);
 
-    return (
+    useEffect(() => {
+          if (!token) {
+            navigate("/login");
+          }
+        }, [token, navigate]);
+      
+        if (!token) {
+          return null; // Render nothing while redirecting
+        }
+      
+      return (
         <div className="container" onClick={handleLogin}>
             {visible && (
                 <div className="success-container">

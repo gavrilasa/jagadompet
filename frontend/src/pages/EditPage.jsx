@@ -3,9 +3,11 @@ import back from "../images/return.png";
 import shop from "../images/shopbag.png";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from 'react';
 
 const TransactionDetailPage = () => {
   const [showPopup, setShowPopup] = useState(false);
+  const token = localStorage.getItem('token');
 
   const handleDeleteClick = () => {
     setShowPopup(true);
@@ -26,8 +28,17 @@ const TransactionDetailPage = () => {
     e.preventDefault();
     navigate("/history");
   };
-
-  return (
+ //use effect taroh sini sebelum return
+  useEffect(() => {
+        if (!token) {
+          navigate("/login");
+        }
+      }, [token, navigate]);
+    
+      if (!token) {
+        return null; // Render nothing while redirecting
+      }
+    return (
     <div className="w-full h-full absolute bg-[#FCEED4]">
       {/* Header with Back Button */}
       <div className="w-[375px] h-[64px] mt-[44px] flex items-center relative">

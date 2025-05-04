@@ -3,14 +3,11 @@ import { LuPen } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import profile from "../images/pp.png";
 import { useState } from "react";
+import { useEffect } from 'react';
 
 const LogoutPage = () => {
   const navigate = useNavigate();
-
-  const handleSign = (e) => {
-    e.preventDefault();
-    navigate("/sign");
-  };
+  const token = localStorage.getItem('token');
 
   const [showPopup, setShowPopup] = useState(false);
 
@@ -28,7 +25,17 @@ const LogoutPage = () => {
     navigate("/");
   };
 
-  return (
+  useEffect(() => {
+        if (!token) {
+          navigate("/login");
+        }
+      }, [token, navigate]);
+    
+      if (!token) {
+        return null; // Render nothing while redirecting
+      }
+    
+    return (
     <div className="relative w-full h-screen">
       <div className="absolute z-10 w-full flex min-h-screen justify-center ">
         <div>

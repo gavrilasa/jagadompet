@@ -1,5 +1,5 @@
 // src/pages/loginpage.js
-import React from "react";
+import React, { useState } from "react";
 import { IoEyeOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import back from "../images/return.png";
@@ -7,14 +7,49 @@ import back from "../images/return.png";
 const LoginPage = () => {
   const navigate = useNavigate();
 
+  // Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        // Redirect after success
+        navigate("/view");
+      } else {
+        const errorData = await res.json();
+        alert("Sign up failed: " + errorData.message);
+      }
+    } catch (error) {
+      alert("Error connecting to server: " + error.message);
+    }
+  };
+
   const handleSign = (e) => {
     e.preventDefault();
     navigate("/login");
   };
-  const handleView = (e) => {
-    e.preventDefault();
-    navigate("/view");
-  };
+
   const backSign = (e) => {
     e.preventDefault();
     navigate("/");
@@ -22,47 +57,53 @@ const LoginPage = () => {
 
   return (
     <div className="relative w-full h-screen">
-      {/* Form wrapper */}
-      <div className="absolute z-10 w-full flex min-h-screen justify-center ">
+      <div className="absolute z-10 w-full flex min-h-screen justify-center">
         <div className="text-[16px] leading-[18px]">
-          {/* Header */}
           <div className="text-[18px] mt-[44px] mb-[56px] justify-center grid place-items-center w-[375px] h-[64px] text-center font-semibold">
-            <button className= "absolute left-[20px]" onClick={backSign}>
+            <button className="absolute left-[20px]" onClick={backSign}>
               <img src={back} alt="Back" className="w-[24px] h-[24px]" />
             </button>
             <p className="font-semibold text-[18px]">Expense</p>
           </div>
 
-          {/* Form Login */}
-          <form className="mx-[16px] items-center">
+          <form className="mx-[16px] items-center" onSubmit={handleSubmit}>
             <div className="flex mb-[24px] w-[343px] h-[56px] items-center border rounded-[16px] py-[8px] px-[16px] gap-[10px]">
               <input
+                name="name"
                 type="text"
                 placeholder="Name"
+                value={formData.name}
+                onChange={handleChange}
                 className="my-1 outline-none w-full bg-transparent text-gray-800 placeholder-gray-500"
               />
             </div>
 
             <div className="flex mb-[24px] w-[343px] h-[56px] items-center border rounded-[16px] py-[8px] px-[16px] gap-[10px]">
               <input
+                name="email"
                 type="email"
                 placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
                 className="outline-none w-full bg-transparent text-gray-800 placeholder-gray-500"
               />
             </div>
 
             <div className="flex mb-[24px] w-[343px] h-[56px] items-center border rounded-[16px] py-[8px] px-[16px] gap-[10px]">
               <input
+                name="password"
                 type="password"
                 placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
                 className="outline-none w-full bg-transparent text-gray-800 placeholder-gray-500"
               />
-              <span className="mr-2 text-2xl ">
+              <span className="mr-2 text-2xl">
                 <IoEyeOutline />
               </span>
             </div>
 
-            <div class="flex items-center mb-[24px]">
+            <div className="flex items-center mb-[24px]">
               <input
                 type="checkbox"
                 className="w-[32px] h-[32px] mr-[10px] accent-[#42AB39]"
@@ -72,13 +113,14 @@ const LoginPage = () => {
                 Policy
               </label>
             </div>
+
             <button
               type="submit"
               className="text-[18px] leading-[100%] bg-[#42AB39] hover:bg-white hover:text-black text-white mb-[24px] w-[343px] h-[56px] py-[8px] px-[16px] gap-[10px] rounded-[16px] font-semibold"
-              onClick={handleView}
             >
               Sign Up
             </button>
+
             <div className="text-center text-[#91919F] cursor-pointer font-medium">
               Already have an account?{" "}
               <a className="text-[#42AB39] underline" onClick={handleSign}>
@@ -93,3 +135,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+

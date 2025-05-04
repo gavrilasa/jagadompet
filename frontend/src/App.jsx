@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import WelcomeinPage from './pages/WelcomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
-import HomePage from './pages/Home.jsx'
 import ViewPage from './pages/view.jsx';
 import SignPage from './pages/SignPage.jsx';
 import LogoutPage from './pages/LogOut.jsx';
@@ -19,7 +18,6 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<WelcomeinPage />} />
-          <Route path="/home" element={<HomePage />} />
           <Route path="/dash" element={<DashboardPage />} />
           <Route path="/view" element={<ViewPage />} />
           <Route path="/sign" element={<SignPage />} />
