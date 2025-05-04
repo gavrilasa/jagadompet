@@ -1,7 +1,7 @@
 import { Router } from "express";
 const router = Router();
-import { getTransactions, createTransaction, updateTransaction, deleteTransaction, getSummary, getChartData } from "../controllers/transactionController";
-import validateTransaction from "../middlewares/validateTransaction";
+import { getTransactions, createTransaction, updateTransaction, deleteTransaction, getSummary } from "../controllers/transaction.controller.js";
+import validateTransaction from "../middleware/validate.transaction.js";
 
 //Ambil semua transaksi
 router.get("/", getTransactions);
@@ -18,7 +18,5 @@ router.delete("/:id", deleteTransaction);
 //total income, expense, balance
 router.get("/summary", getSummary);
 
-//Data chart pengeluaran per kategori
-router.get("/chart", getChartData);
 
 export default router;

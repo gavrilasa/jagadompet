@@ -1,5 +1,6 @@
-import Transaction, { find, findByIdAndUpdate, findByIdAndDelete, aggregate } from "../models/transaction.model";
+import Transaction from "../models/transaction.model.js";
 
+// Create a new transaction
 export async function createTransaction(req, res) {
   try {
     const transaction = new Transaction(req.body);
@@ -10,42 +11,62 @@ export async function createTransaction(req, res) {
   }
 }
 
+// Get all transactions
 export async function getTransactions(req, res) {
   try {
-    const transactions = await find().sort({ date: -1 });
+    const transactions = await Transaction.find().sort({ date: -1 });
     res.json(transactions);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch transactions." });
   }
 }
 
+// Update a transaction by ID
 export async function updateTransaction(req, res) {
   try {
-    const transaction = await findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const transaction = await Transaction.findOneAndUpdate(
+      { transaction_id: req.params.id },  // use custom field here
+      req.body,
+      { new: true }
+    );
+
+    if (!transaction) {
+      return res.status(404).json({ error: "Transaction not found." });
+    }
+
     res.json(transaction);
   } catch (err) {
     res.status(500).json({ error: "Failed to update transaction." });
   }
 }
 
+
+// Delete a transaction by ID
 export async function deleteTransaction(req, res) {
   try {
-    await findByIdAndDelete(req.params.id);
+    const deleted = await Transaction.findOneAndDelete(
+      { transaction_id: req.params.id });
+    if (!deleted) {
+      return res.status(404).json({ error: "Transaction not found." });
+    }
     res.json({ message: "Transaction deleted." });
   } catch (err) {
     res.status(500).json({ error: "Failed to delete transaction." });
   }
 }
 
+// Get income, expense, and balance summary
 export async function getSummary(req, res) {
   try {
-    const user_id = req.query.user_id; // atau ambil dari token/session
-    const [income] = await aggregate([
-      { $match: { user_id, type: "income" } },
+    const user_id = Number(req.body.user_id); // konversi string ke number
+
+    const [income] = await Transaction.aggregate([
+      { $match: { user_id: user_id, type: "income" } },
       { $group: { _id: null, total: { $sum: "$amount" } } }
     ]);
-    const [expense] = await aggregate([
-      { $match: { user_id, type: "expense" } },
+
+    const [expense] = await Transaction.aggregate([
+      { $match: { user_id: user_id, type: "expense" } },
       { $group: { _id: null, total: { $sum: "$amount" } } }
     ]);
 
@@ -59,15 +80,4 @@ export async function getSummary(req, res) {
   }
 }
 
-export async function getChartData(req, res) {
-  try {
-    const user_id = req.query.user_id;
-    const data = await aggregate([
-      { $match: { user_id, type: "expense" } },
-      { $group: { _id: "$category", total: { $sum: "$amount" } } }
-    ]);
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch chart data." });
-  }
-}
+
