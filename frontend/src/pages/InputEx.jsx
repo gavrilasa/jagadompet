@@ -11,6 +11,7 @@ import game from "../images/entcat.png";
 import other from "../images/category3.png";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css"; // Untuk styling kalender
+import { useEffect } from 'react';
 
 const TransactionDetailPage = () => {
   const [amount, setAmount] = useState("");
@@ -23,6 +24,7 @@ const TransactionDetailPage = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [category, setCategory] = useState("");
+  const token = localStorage.getItem('token');
   const [date, setDate] = useState("");
 
   const navigate = useNavigate();
@@ -77,8 +79,17 @@ const TransactionDetailPage = () => {
   };
 
   const isButtonEnabled = amount && selectedCategory && selectedDate;
-
-  return (
+   useEffect(() => {
+        if (!token) {
+          navigate("/login");
+        }
+      }, [token, navigate]);
+    
+      if (!token) {
+        return null; // Render nothing while redirecting
+      }
+    
+    return (
     <div className="w-full min-h-screen bg-[#FA2F34] flex flex-col relative overflow-hidden">
       {/* Header */}
       <div className="w-full h-[64px] mt-[44px] flex items-center justify-center relative">

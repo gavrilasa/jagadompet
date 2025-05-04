@@ -8,6 +8,8 @@ import other from "../images/category3.png";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css"; // Untuk styling kalender
 import { useNavigate } from "react-router-dom";
+import { useEffect } from 'react';
+
 
 const TransactionDetailPage = () => {
   const [amount, setAmount] = useState("");
@@ -20,6 +22,7 @@ const TransactionDetailPage = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [category, setCategory] = useState("");
+  const token = localStorage.getItem('token');
   const [date, setDate] = useState("");
 
   const navigate = useNavigate();
@@ -75,7 +78,17 @@ const TransactionDetailPage = () => {
 
   const isButtonEnabled = amount;
 
-  return (
+  useEffect(() => {
+        if (!token) {
+          navigate("/login");
+        }
+      }, [token, navigate]);
+    
+      if (!token) {
+        return null; // Render nothing while redirecting
+      }
+    
+    return (
     <div className="w-full min-h-screen bg-[#00C153] flex flex-col relative overflow-hidden">
       {/* Header */}
       <div
