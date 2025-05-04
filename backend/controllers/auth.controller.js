@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import { hashPassword, comparePassword } from "../utils/hashPassword.js";
+import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
   try {
@@ -58,9 +59,19 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Generate JWT token
+    const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, {
+      expiresIn: "24h",
+    });
+
     res.status(200).json({
       message: "Login successful",
-      user: { id: user.user_id, name: user.name, email: user.email },
+      token,
+      user: {
+        id: user.user_id,
+        name: user.name,
+        email: user.email,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
