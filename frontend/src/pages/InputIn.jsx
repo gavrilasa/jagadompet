@@ -23,6 +23,7 @@ const TransactionDetailPage = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [category, setCategory] = useState("");
   const token = localStorage.getItem('token');
+  const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
 
   const navigate = useNavigate();
@@ -57,6 +58,11 @@ const TransactionDetailPage = () => {
     setSelectedCategoryImage(categoryImage);
     setSelectedCategoryBg(categoryBg);
     setShowCategoryPopup(false);
+    if (category === "pocketmoney") {
+      setCategory("Pocket Money");
+    } else {
+      setCategory(category.charAt(0).toUpperCase() + category.slice(1));
+    }
   };
 
   const handleCalendarClick = () => {
@@ -66,6 +72,7 @@ const TransactionDetailPage = () => {
   const handleDateSelect = (date) => {
     setSelectedDate(date);
     setShowCalendar(false);
+    
   };
 
   const handleCategoryChange = (e) => {
@@ -76,7 +83,7 @@ const TransactionDetailPage = () => {
     setDate(e.target.value);
   };
 
-  const isButtonEnabled = amount;
+  const isButtonEnabled = amount && selectedCategory && selectedDate;
 
   useEffect(() => {
         if (!token) {
@@ -87,6 +94,7 @@ const TransactionDetailPage = () => {
       if (!token) {
         return null; // Render nothing while redirecting
       }
+      
     
     return (
     <div className="w-full min-h-screen bg-[#00C153] flex flex-col relative overflow-hidden">
@@ -150,7 +158,7 @@ const TransactionDetailPage = () => {
                   className="w-[40px] h-[40px] ml-[16px]"
                 />
                 <span className="text-[#292B2D] font-medium text-[16px]  ml-[8px]">
-                  {selectedCategory}
+                  {selectedCategory === "pocketmoney" ? "Pocket Money" : selectedCategory}
                 </span>
               </div>
             ) : (
@@ -166,6 +174,8 @@ const TransactionDetailPage = () => {
           <div className="flex ml-[14px] font-[400] text-[#0D0E0F]">
             <input
               placeholder="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               className="text-[#91919F]/200 border-none outline-none "
             />
           </div>
@@ -217,6 +227,37 @@ const TransactionDetailPage = () => {
               isButtonEnabled ? "bg-[#00C153]" : "bg-[#AAAAAA]"
             }`}
             disabled={!isButtonEnabled}
+            onClick={async () => {
+              const numericAmount = parseInt(amount.replace(/\./g, ""), 10);
+          
+              const payload = {
+                user_id: 1, // Replace with real user ID from auth or context
+                type: "income", // or "expense"
+                category: selectedCategory,
+                amount: numericAmount,
+                date: selectedDate,
+                description: description,
+              };
+          
+              try {
+                const res = await fetch("http://localhost:5000/api/transactions", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                });
+          
+                if (res.ok) {
+                  const result = await res.json();
+                  console.log("Transaction saved:", result);
+                  navigate("/dash"); // Go back to dashboard or show success message
+                } else {
+                  const err = await res.json();
+                  console.error("Server error:", err);
+                }
+              } catch (err) {
+                console.error("Request failed:", err);
+              }
+            }}
           >
             Add Income
           </button>
@@ -246,7 +287,7 @@ const TransactionDetailPage = () => {
 
               <div
                 onClick={() =>
-                  handleCategorySelect("Pocket Money", pocket, "bg-[#FFF8D8]")
+                  handleCategorySelect("pocketmoney", pocket, "bg-[#FFF8D8]")
                 }
                 className="flex w-[343px] pl-[8px] h-[74px] border-[1px] text-[#91919F] border-[#F1F1FA] rounded-[16px]  mt-[16px] items-center"
               >
@@ -258,7 +299,7 @@ const TransactionDetailPage = () => {
 
               <div
                 onClick={() =>
-                  handleCategorySelect("Lainnya", other, "bg-[#E8E8E8]")
+                  handleCategorySelect("Other", other, "bg-[#E8E8E8]")
                 }
                 className="flex w-[343px] pl-[8px] h-[74px] border-[1px] text-[#91919F] border-[#F1F1FA] rounded-[16px] mt-[16px]  items-center"
               >
