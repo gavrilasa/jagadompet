@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import graph from "../images/graph.png";
 import pp from "../images/pp.png";
 import inc from "../images/income.png";
@@ -27,38 +27,28 @@ const DashboardPage = () => {
     navigate("/history");
   };
 
-  const [transactions] = useState([
-    {
-      id: 1,
-      title: "Shopping",
-      desc: "Buy some grocery",
-      amount: -120,
-      time: "10:00 AM",
-      icon: shop,
-      bgColor: "#FCEED4",
-      textColor: "#FD3C4A",
-    },
-    {
-      id: 2,
-      title: "Subscription",
-      desc: "Disney+ Annual...",
-      amount: -80,
-      time: "03:30 PM",
-      icon: bill,
-      bgColor: "#EEE5FF",
-      textColor: "#FD3C4A",
-    },
-    {
-      id: 3,
-      title: "Food",
-      desc: "Buy a ramen",
-      amount: -32,
-      time: "07:30 PM",
-      icon: food,
-      bgColor: "#FDD5D7",
-      textColor: "#FD3C4A",
-    },
-  ]);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/transactions");
+        if (!res.ok) {
+          throw new Error("Failed to fetch transactions");
+        }
+        const data = await res.json();
+        setTransactions(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
 
   return (
     <div>
@@ -146,34 +136,53 @@ const DashboardPage = () => {
 
         {/* Transaction List */}
         <div className="flex flex-col gap-[6px]">
-          {transactions.map((tx) => (
-            <div
-              key={tx.id}
-              className="flex items-center justify-between bg-[#FCFCFC] p-4 rounded-[24px] w-[335px] h-[89px] mx-[20px]"
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-[60px] h-[60px] rounded-[16px] flex items-center justify-center"
-                  style={{ backgroundColor: tx.bgColor }}
-                >
-                  <img src={tx.icon} className="w-10 h-10 object-contain" alt={tx.title} />
+          {loading && <p className="text-center">Loading transactions...</p>}
+          {error && <p className="text-center text-red-500">{error}</p>}
+          {!loading && !error && transactions.length === 0 && (
+            <p className="text-center">No transactions found.</p>
+          )}
+          {!loading &&
+            !error &&
+            transactions.map((tx) => (
+              <div
+                key={tx.transaction_id}
+                className="flex items-center justify-between bg-[#FCFCFC] p-4 rounded-[24px] w-[335px] h-[89px] mx-[20px]"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-[60px] h-[60px] rounded-[16px] flex items-center justify-center"
+                    style={{ backgroundColor: tx.bgColor || "#eee" }}
+                  >
+                    <img
+                      src={
+                        tx.icon
+                          ? require(`../images/${tx.icon}`)
+                          : shop
+                      }
+                      className="w-10 h-10 object-contain"
+                      alt={tx.title || "transaction"}
+                    />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[16px] mb-[12px]">
+                      {tx.title || "No Title"}
+                    </p>
+                    <p className="text-[#91919F] text-[13px]">
+                      {tx.desc || "No Description"}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-[16px] mb-[12px]">{tx.title}</p>
-                  <p className="text-[#91919F] text-[13px]">{tx.desc}</p>
+                <div className="text-right">
+                  <p
+                    className="text-[16px] font-semibold mb-[12px]"
+                    style={{ color: tx.amount < 0 ? "#FD3C4A" : "#42AB39" }}
+                  >
+                    {tx.amount < 0 ? `- $${-tx.amount}` : `+ $${tx.amount}`}
+                  </p>
+                  <p className="text-[#91919F] text-[13px]">{tx.time || ""}</p>
                 </div>
               </div>
-              <div className="text-right">
-                <p
-                  className="text-[16px] font-semibold mb-[12px]"
-                  style={{ color: tx.textColor }}
-                >
-                  {tx.amount < 0 ? `- $${-tx.amount}` : `+ $${tx.amount}`}
-                </p>
-                <p className="text-[#91919F] text-[13px]">{tx.time}</p>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </div>
