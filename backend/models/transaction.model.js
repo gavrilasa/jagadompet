@@ -37,7 +37,7 @@ const transactionSchema = new Schema(
   }
 );
 
-// 👉 Add auto-increment plugin here
+// Add auto-increment plugin here
 transactionSchema.plugin(AutoIncrement, {
   inc_field: "transaction_id", // the auto-increment field name
   start_seq: 1,                // optional: start from 1

@@ -1,6 +1,6 @@
 import { Router } from "express";
 const router = Router();
-import { getTransactions, createTransaction, updateTransaction, deleteTransaction, getSummary } from "../controllers/transaction.controller.js";
+import { getTransactions, createTransaction, updateTransaction, deleteTransaction, getSummary, getSpendFrequency } from "../controllers/transaction.controller.js";
 import validateTransaction from "../middleware/validate.transaction.js";
 
 //Ambil semua transaksi
@@ -17,6 +17,9 @@ router.delete("/:id", deleteTransaction);
 
 //total income, expense, balance
 router.get("/summary", getSummary);
+
+// grafik pengeluaran
+router.get("/spend-frequency", getSpendFrequency);
 
 
 export default router;
