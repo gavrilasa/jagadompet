@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IoEyeOutline } from "react-icons/io5";
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import back from "../images/return.png";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +8,7 @@ const LoginPage = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSign = (e) => {
     e.preventDefault();
@@ -26,7 +27,7 @@ const LoginPage = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-      
+
       if (!res.ok) {
         const errorData = await res.json();
         alert("Login failed: " + errorData.message);
@@ -60,7 +61,6 @@ const LoginPage = () => {
 
       // Step 4: Navigate to protected route
       navigate("/view");
-
     } catch (error) {
       alert("Error connecting to server: " + error.message);
     }
@@ -99,15 +99,18 @@ const LoginPage = () => {
 
             <div className="flex mb-[40px] w-[343px] h-[56px] items-center border rounded-[16px] py-[8px] px-[16px] gap-[10px]">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"} // toggle input type
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="outline-none w-full bg-transparent text-gray-800 placeholder-gray-500"
                 required
               />
-              <span className="mr-2 text-2xl">
-                <IoEyeOutline />
+              <span
+                className="mr-2 text-2xl cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
               </span>
             </div>
 

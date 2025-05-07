@@ -3,11 +3,12 @@ import { LuPen } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import profile from "../images/pp.png";
 import { useState } from "react";
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 const LogoutPage = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
+  const user_id = localStorage.getItem("user_id");
 
   const [showPopup, setShowPopup] = useState(false);
 
@@ -19,23 +20,24 @@ const LogoutPage = () => {
     setShowPopup(false);
   };
 
-  const handleConfirmLogout = (e) => {
-    // Aksi logout beneran taruh di sini
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    localStorage.removeItem("token", token);
+    localStorage.removeItem("user_id", user_id);
     navigate("/");
   };
 
   useEffect(() => {
-        if (!token) {
-          navigate("/login");
-        }
-      }, [token, navigate]);
-    
-      if (!token) {
-        return null; // Render nothing while redirecting
-      }
-    
-    return (
+    if (!token) {
+      navigate("/login");
+    }
+  }, [token, navigate]);
+
+  if (!token) {
+    return null; // Render nothing while redirecting
+  }
+
+  return (
     <div className="relative w-full h-screen">
       <div className="absolute z-10 w-full flex min-h-screen justify-center ">
         <div>
@@ -91,7 +93,7 @@ const LogoutPage = () => {
                     </button>
 
                     <button
-                      onClick={handleConfirmLogout}
+                      onClick={handleSubmit}
                       className="bg-red-500 text-white font-semibold rounded-[15px] w-[148px] h-[50px]"
                     >
                       Logout
