@@ -260,7 +260,7 @@ const TransactionDetailPage = () => {
         </div>
       </div>
 
-      {/* 🔥 Popup Category Selection */}
+      {/*  Popup Category Selection */}
       {showCategoryPopup && (
         <div className="fixed inset-0 flex items-end justify-center bg-[#0D0E0F]/16 z-50">
           <div className="bg-white w-full max-w-[375px] rounded-t-[32px] pt-2 pb-[58px]">

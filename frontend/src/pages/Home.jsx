@@ -7,9 +7,30 @@ import shop from "../images/shopbag.png";
 import down from "../images/downhome.png";
 import { useNavigate } from "react-router-dom";
 import { categoryMapping } from "../components/Dropdown";
+import Chart from 'react-apexcharts';
+
 
 const DashboardPage = () => {
   const navigate = useNavigate();
+
+  const [chartOptions, setChartOptions] = useState({
+    chart: {
+      id: 'spend-frequency',
+      toolbar: { show: false }
+    },
+    xaxis: {
+      categories: [],          // we’ll fill this with the last 10 dates
+      labels: { rotate: -45 }
+    },
+    yaxis: {
+      
+    },
+    stroke: { curve: 'smooth' },
+    dataLabels: { enabled: false }
+  });
+  const [chartSeries, setChartSeries] = useState([
+    { name: 'Transactions', data: [] }
+  ]);  
 
   const handleExpense = (e) => {
     e.preventDefault();
@@ -36,6 +57,7 @@ const DashboardPage = () => {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
   const [balance, setBalance] = useState(0);
+  
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -61,6 +83,56 @@ const DashboardPage = () => {
         setTotalIncome(income);
         setTotalExpense(expense);
         setBalance(income - expense);
+
+       
+        const today = new Date();
+        const last10Days = Array.from({ length: 10 }).map((_, i) => {
+          const d = new Date(today);
+          d.setDate(today.getDate() - (9 - i));
+          return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }); 
+        });
+
+        
+        const sumMap = last10Days.reduce((acc, date) => {
+          acc[date] = 0;
+          return acc;
+        }, {});        
+        data.forEach(tx => {
+          if (tx.type !== 'expense') return;       // ignore income
+          const localKey = new Date(tx.date)
+          .toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+          if (sumMap[localKey] !== undefined) {
+            sumMap[localKey] += tx.amount;         // add amt instead of ++
+          }
+        });
+        
+
+        // 3) update chart state
+        const maxValue = Math.max(...last10Days.map(date => sumMap[date] || 0));
+        const roundedMax = Math.ceil(maxValue / 100000) * 100000 || 100000;
+        setChartOptions(opts => ({
+          ...opts,
+          xaxis: { 
+            ...opts.xaxis, 
+            categories: last10Days 
+          },
+          colors: ['#42AB39'], 
+          yaxis: {
+            min: 0,
+            max: roundedMax,
+            tickAmount: 4,
+            labels: {
+              formatter: (value) => value.toLocaleString("id-ID"),
+            },
+          },
+        }));
+        setChartSeries([{
+          name: 'Expense Amount',
+          data: last10Days.map(date => sumMap[date])
+        }]);
+        
+
+
       } catch (err) {
         setError(err.message);
       } finally {
@@ -136,14 +208,30 @@ const DashboardPage = () => {
         </div>
 
         {/* Spend Frequency */}
-        <div className="w-[375px] h-[48px] items-center flex mt-[24px]">
+        <div className="w-[375px] h-[48px] flex items-center mt-[24px]">
+          <p className="pl-[20px] font-semibold text-[18px] leading-[100%]">
+            Spend Frequency
+          </p>
+        </div>
+        <div className="mb-[28px] mt-[10px] flex items-center justify-center">
+          <div id="chart">
+            <Chart
+              options={chartOptions}
+              series={chartSeries}
+              type="line"
+              width="335"
+              height="200"
+            />
+          </div>
+        </div>
+        {/* <div className="w-[375px] h-[48px] items-center flex mt-[24px]">
           <p className="pl-[20px] font-semibold text-[18px] leading-[100%]">
             Spend Frequency
           </p>
         </div>
         <div className="mb-[28px] mt-[10px] flex items-center justify-center">
           <img src={graph} alt="graph" />
-        </div>
+        </div> */}
 
         {/* Recent Transaction Header */}
         <div className="w-[375px] h-[48px] items-center flex mt-[24px] mb-3">
