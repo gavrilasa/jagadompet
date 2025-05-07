@@ -80,4 +80,38 @@ export async function getSummary(req, res) {
   }
 }
 
+// Get spending frequency (e.g., total expense per day)
+export async function getSpendFrequency(req, res) {
+  try {
+    const user_id = Number(req.body.user_id); // ambil dari query parameter
+
+    const result = await Transaction.aggregate([
+      {
+        $match: {
+          user_id: user_id,
+          type: "expense"
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$date" }
+          },
+          total: { $sum: "$amount" }
+        }
+      },
+      {
+        $sort: { _id: 1 } // urutkan berdasarkan tanggal naik
+      }
+    ]);
+
+    res.json(result.map(item => ({
+      date: item._id,
+      total: item.total
+    })));
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch spend frequency." });
+  }
+}
+
 
