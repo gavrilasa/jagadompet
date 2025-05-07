@@ -1,6 +1,6 @@
 // src/pages/loginpage.js
 import React, { useState } from "react";
-import { IoEyeOutline } from "react-icons/io5";
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import back from "../images/return.png";
 
@@ -13,6 +13,8 @@ const LoginPage = () => {
     email: "",
     password: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -63,7 +65,7 @@ const LoginPage = () => {
             <button className="absolute left-[20px]" onClick={backSign}>
               <img src={back} alt="Back" className="w-[24px] h-[24px]" />
             </button>
-            <p className="font-semibold text-[18px]">Expense</p>
+            <p className="font-semibold text-[18px]">Sign Up</p>
           </div>
 
           <form className="mx-[16px] items-center" onSubmit={handleSubmit}>
@@ -92,14 +94,14 @@ const LoginPage = () => {
             <div className="flex mb-[24px] w-[343px] h-[56px] items-center border rounded-[16px] py-[8px] px-[16px] gap-[10px]">
               <input
                 name="password"
-                type="password"
+                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
                 className="outline-none w-full bg-transparent text-gray-800 placeholder-gray-500"
               />
-              <span className="mr-2 text-2xl">
-                <IoEyeOutline />
+              <span className="mr-2 text-2xl cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
               </span>
             </div>
 

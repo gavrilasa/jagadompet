@@ -4,10 +4,9 @@ import pp from "../images/pp.png";
 import inc from "../images/income.png";
 import exp from "../images/expense.png";
 import shop from "../images/shopbag.png";
-import bill from "../images/bill.png";
-import food from "../images/food.png";
 import down from "../images/downhome.png";
 import { useNavigate } from "react-router-dom";
+import { categoryMapping } from "../components/Dropdown";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -26,10 +25,17 @@ const DashboardPage = () => {
     e.preventDefault();
     navigate("/history");
   };
+  const handleProfile = (e) => {
+    e.preventDefault();
+    navigate("/logout");
+  }
 
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [totalIncome, setTotalIncome] = useState(0);
+  const [totalExpense, setTotalExpense] = useState(0);
+  const [balance, setBalance] = useState(0);
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -40,6 +46,21 @@ const DashboardPage = () => {
         }
         const data = await res.json();
         setTransactions(data);
+
+        // Calculate totals
+        let income = 0;
+        let expense = 0;
+        data.forEach((tx) => {
+          if (tx.type === "income") {
+            income += tx.amount;
+          } else if (tx.type === "expense") {
+            expense += tx.amount;
+          }
+        });
+
+        setTotalIncome(income);
+        setTotalExpense(expense);
+        setBalance(income - expense);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -56,7 +77,7 @@ const DashboardPage = () => {
         {/* Header */}
         <div className="w-[375px] h-[64px]  mt-[44px] flex justify-center items-center">
           <div className="w-[337px] h-[40px] flex items-center justify-between">
-            <div className="w-[38px] h-[38px] bg-gray-300 rounded-full">
+            <div className="w-[38px] h-[38px] bg-gray-300 rounded-full" onClick={handleProfile}>
               <img src={pp} alt="profile" />
             </div>
             <button className="text-[14px] w-[107px] h-[40px] bg-transparent border border-[#42AB39] rounded-[40px] font-medium flex items-center justify-center">
@@ -71,7 +92,10 @@ const DashboardPage = () => {
         {/* Remaining Money */}
         <div className="text-center mb-6">
           <p className="text-gray-500">Your Remaining Money</p>
-          <h1 className="text-[40px] font-semibold mt-[9px]">Rp 1.000.000</h1>
+          <h1 className="text-[40px] font-semibold mt-[9px]">
+            {" "}
+            Rp {balance.toLocaleString("id-ID")}
+          </h1>
         </div>
 
         {/* Income & Expenses */}
@@ -88,7 +112,7 @@ const DashboardPage = () => {
             <div className="flex flex-col ml-[10px]">
               <p className="text-[#FCFCFC] text-[14px] font-medium">Income</p>
               <p className="text-[#FCFCFC] text-[22px] font-semibold">
-                Rp 1.500.000
+                Rp {totalIncome.toLocaleString("id-ID")}
               </p>
             </div>
           </div>
@@ -105,7 +129,7 @@ const DashboardPage = () => {
             <div className="flex flex-col ml-[10px]">
               <p className="text-[#FCFCFC] text-[14px] font-medium">Expenses</p>
               <p className="text-[#FCFCFC] text-[22px] font-semibold">
-                Rp 500.000
+                Rp {totalExpense.toLocaleString("id-ID")}
               </p>
             </div>
           </div>
@@ -143,46 +167,71 @@ const DashboardPage = () => {
           )}
           {!loading &&
             !error &&
-            transactions.map((tx) => (
-              <div
-                key={tx.transaction_id}
-                className="flex items-center justify-between bg-[#FCFCFC] p-4 rounded-[24px] w-[335px] h-[89px] mx-[20px]"
-              >
-                <div className="flex items-center gap-3">
+            transactions
+              .filter((tx) => {
+                if (!tx.date) return false;
+
+                const txDate = new Date(tx.date);
+                const today = new Date();
+              
+                return (
+                  txDate.getFullYear() === today.getFullYear() &&
+                  txDate.getMonth() === today.getMonth() &&
+                  txDate.getDate() === today.getDate()
+                );
+              })
+              .map((tx) => {
+                const categoryKey = tx.category?.toLowerCase?.() || "";
+                const map = categoryMapping[categoryKey] || {};
+                const icon = map.icon || shop;
+                const bgColor = map.bgColor || "#EEE";
+                const textColor = tx.type === "income" ? "#42AB39" : "#FD3C4A";
+                const formattedAmount = tx.amount.toLocaleString("id-ID");
+
+                return (
                   <div
-                    className="w-[60px] h-[60px] rounded-[16px] flex items-center justify-center"
-                    style={{ backgroundColor: tx.bgColor || "#eee" }}
+                    key={tx.transaction_id}
+                    className="flex items-center justify-between bg-[#FCFCFC] p-4 rounded-[24px] w-[335px] h-[89px] mx-[20px]"
                   >
-                    <img
-                      src={
-                        tx.icon
-                          ? require(`../images/${tx.icon}`)
-                          : shop
-                      }
-                      className="w-10 h-10 object-contain"
-                      alt={tx.title || "transaction"}
-                    />
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-[60px] h-[60px] rounded-[16px] flex items-center justify-center"
+                        style={{ backgroundColor: bgColor }}
+                      >
+                        <img
+                          src={icon}
+                          className="w-10 h-10 object-contain"
+                          alt={tx.category}
+                        />
+                      </div>
+                      <div>
+                        <p className="font-medium text-[16px] mb-[12px]">
+                          {map.label || tx.category}
+                        </p>
+                        <p className="text-[#91919F] text-[13px] break-words max-w-[150px]">
+                          {tx.description || "No Description"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p
+                        className="text-[16px] font-semibold mb-[12px]"
+                        style={{ color: textColor }}
+                      >
+                        {tx.type === "income"
+                          ? `+Rp ${formattedAmount}`
+                          : `-Rp ${formattedAmount}`}
+                      </p>
+                      <p className="text-[#91919F] text-[13px]">
+                        {new Date(tx.date).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-[16px] mb-[12px]">
-                      {tx.title || "No Title"}
-                    </p>
-                    <p className="text-[#91919F] text-[13px]">
-                      {tx.desc || "No Description"}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p
-                    className="text-[16px] font-semibold mb-[12px]"
-                    style={{ color: tx.amount < 0 ? "#FD3C4A" : "#42AB39" }}
-                  >
-                    {tx.amount < 0 ? `- $${-tx.amount}` : `+ $${tx.amount}`}
-                  </p>
-                  <p className="text-[#91919F] text-[13px]">{tx.time || ""}</p>
-                </div>
-              </div>
-            ))}
+                );
+              })}
         </div>
       </div>
     </div>

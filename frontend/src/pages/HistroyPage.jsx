@@ -1,11 +1,6 @@
-// src/pages/HistoryPage.js
-import shop from "../images/shopbag.png";
-import bill from "../images/bill.png";
-import food from "../images/food.png";
+
 import back from "../images/return.png";
 import down from "../images/downfall.png";
-import transport from "../images/portal.png";
-import salary from "../images/salary.png";
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { useEffect } from 'react';
@@ -80,13 +75,13 @@ const History = () => {
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
 
-    if (
-      date.toDateString() === today.toDateString()
-    ) return "Today";
-    else if (
-      date.toDateString() === yesterday.toDateString()
-    ) return "Yesterday";
-    else return date.toLocaleDateString();
+    const todayStr = today.toDateString();
+    const yesterdayStr = yesterday.toDateString();
+    const txStr = date.toDateString();
+  
+    if (txStr === todayStr) return "Today";
+    if (txStr === yesterdayStr) return "Yesterday";
+    return "Past";
   };
 
   const renderTransactionsByDay = (label) => {
@@ -155,7 +150,7 @@ const History = () => {
       </div>
 
       {/* Sections */}
-      {["Today", "Yesterday"].map((label) => (
+      {["Today", "Yesterday", "Past"].map((label) => (
         <React.Fragment key={label}>
           <div className="w-full mt-[20px] mx-[20px]">
             <p className="font-semibold text-[18px] mb-[8px]">{label}</p>
