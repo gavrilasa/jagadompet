@@ -2,6 +2,7 @@ import React from "react";
 import { LuPen } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import profile from "../images/pp.png";
+import back from "../images/return.png";
 import { useState } from "react";
 import { useEffect } from "react";
 
@@ -36,14 +37,22 @@ const LogoutPage = () => {
   if (!token) {
     return null; // Render nothing while redirecting
   }
+  const backSign = (e) => {
+    e.preventDefault();
+    navigate("/dash");
+  };
 
   return (
     <div className="relative w-full h-screen">
       <div className="absolute z-10 w-full flex min-h-screen justify-center ">
         <div>
-          <p className="text-[18px] mt-[44px] justify-center grid place-items-center w-[375px] h-[64px] text-center font-semibold">
-            Profile
-          </p>
+          {/* Header */}
+          <div className="text-[18px] mt-[44px] mb-[56px] justify-center grid place-items-center w-[375px] h-[64px] text-center font-semibold">
+            <button className="absolute left-[20px]" onClick={backSign}>
+              <img src={back} alt="Back" className="w-[24px] h-[24px]" />
+            </button>
+            <p className="font-semibold text-[18px]">Login</p>
+          </div>
           <div>
             <img
               className="w-[200px] h-[200px] mx-[88px] mt-[24px]"
