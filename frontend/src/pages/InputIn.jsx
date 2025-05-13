@@ -8,8 +8,8 @@ import other from "../images/category3.png";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css"; // Untuk styling kalender
 import { useNavigate } from "react-router-dom";
-import { useEffect } from 'react';
-
+import { useEffect } from "react";
+import { fetchWithAuth } from "../utils/api";
 
 const TransactionDetailPage = () => {
   const [amount, setAmount] = useState("");
@@ -22,7 +22,7 @@ const TransactionDetailPage = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [category, setCategory] = useState("");
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
   const [description, setDescription] = useState("");
   const todayStr = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState("");
@@ -90,17 +90,16 @@ const handleDateSelect = (date) => {
   const isButtonEnabled = amount && selectedCategory && selectedDate;
 
   useEffect(() => {
-        if (!token) {
-          navigate("/login");
-        }
-      }, [token, navigate]);
-    
-      if (!token) {
-        return null; // Render nothing while redirecting
-      }
-      
-    
-    return (
+    if (!token) {
+      navigate("/login");
+    }
+  }, [token, navigate]);
+
+  if (!token) {
+    return null; // Render nothing while redirecting
+  }
+
+  return (
     <div className="w-full min-h-screen bg-[#00C153] flex flex-col relative overflow-hidden">
       {/* Header */}
       <div
@@ -162,7 +161,9 @@ const handleDateSelect = (date) => {
                   className="w-[40px] h-[40px] ml-[16px]"
                 />
                 <span className="text-[#292B2D] font-medium text-[16px]  ml-[8px]">
-                  {selectedCategory === "pocketmoney" ? "Pocket Money" : selectedCategory}
+                  {selectedCategory === "pocketmoney"
+                    ? "Pocket Money"
+                    : selectedCategory}
                 </span>
               </div>
             ) : (
@@ -234,33 +235,26 @@ const handleDateSelect = (date) => {
             disabled={!isButtonEnabled}
             onClick={async () => {
               const numericAmount = parseInt(amount.replace(/\./g, ""), 10);
-          
+
               const payload = {
-                user_id: 1, // Replace with real user ID from auth or context
-                type: "income", // or "expense"
+                type: "income",
                 category: selectedCategory,
                 amount: numericAmount,
                 date: selectedDate,
                 description: description,
               };
-          
+
               try {
-                const res = await fetch("http://localhost:5000/api/transactions", {
+                const result = await fetchWithAuth("/transactions", {
                   method: "POST",
-                  headers: { "Content-Type": "application/json" },
                   body: JSON.stringify(payload),
                 });
-          
-                if (res.ok) {
-                  const result = await res.json();
-                  console.log("Transaction saved:", result);
-                  navigate("/dash"); // Go back to dashboard or show success message
-                } else {
-                  const err = await res.json();
-                  console.error("Server error:", err);
-                }
+
+                console.log("Transaction saved:", result);
+                navigate("/dash");
               } catch (err) {
                 console.error("Request failed:", err);
+                alert(err.message);
               }
             }}
           >

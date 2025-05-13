@@ -7,6 +7,7 @@ import down from "../images/downhome.png";
 import { useNavigate } from "react-router-dom";
 import { categoryMapping } from "../components/Dropdown";
 import Chart from "react-apexcharts";
+import { fetchWithAuth } from "../utils/api";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -57,11 +58,7 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/transactions");
-        if (!res.ok) {
-          throw new Error("Failed to fetch transactions");
-        }
-        const data = await res.json();
+        const data = await fetchWithAuth("/transactions");
         setTransactions(data);
 
         // Calculate totals
