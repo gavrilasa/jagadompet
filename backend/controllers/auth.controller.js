@@ -59,7 +59,6 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Generate JWT token with expiration (24 hours)
     const token = jwt.sign(
       {
         user_id: user.user_id,
