@@ -59,8 +59,14 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Generate JWT token without expiration
-    const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET);
+    // Generate JWT token with expiration (24 hours)
+    const token = jwt.sign(
+      {
+        user_id: user.user_id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+    );
 
     res.status(200).json({
       message: "Login successful",
