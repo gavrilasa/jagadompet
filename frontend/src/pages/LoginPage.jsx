@@ -35,12 +35,11 @@ const LoginPage = () => {
       }
 
       const data = await res.json();
-      const token = data.token;
-      const user_id = data.user_id;
-
-      // Step 2: Save token and user_id to localStorage
+      const { token, user } = data;
+      const userId = user.id;
+     
       localStorage.setItem("token", token);
-      localStorage.setItem("user_id", user_id);
+      localStorage.setItem("user_id", userId);
 
       // Step 3: Fetch protected profile
       const profileRes = await fetch("http://localhost:5000/api/auth/profile", {
@@ -58,6 +57,7 @@ const LoginPage = () => {
 
       const profile = await profileRes.json();
       console.log("User profile:", profile);
+      localStorage.setItem("username", profile.user.name);
 
       // Step 4: Navigate to protected route
       navigate("/view");

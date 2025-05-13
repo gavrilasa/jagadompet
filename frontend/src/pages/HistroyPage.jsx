@@ -10,14 +10,6 @@ const History = () => {
   const [transactions, setTransactions] = useState([]);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const token = localStorage.getItem("token");
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [amount, setAmount] = useState("");
-  const [formData, setFormData] = useState({
-    amount: "",
-    description: "",
-    date: "",
-    category: "",
-  });
 
   useEffect(() => {
     if (!token) {
@@ -69,44 +61,6 @@ const History = () => {
       console.error("Error deleting transaction:", error);
     }
   };
-  const handleEdit = async (updatedFields) => {
-    if (!selectedTransaction) return;
-
-    const fullUpdate = {
-      ...selectedTransaction,
-      ...updatedFields,
-    };
-
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/transactions/${selectedTransaction.transaction_id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(fullUpdate),
-        }
-      );
-
-      if (res.ok) {
-        const updatedTx = await res.json();
-
-        setTransactions((prev) =>
-          prev.map((tx) =>
-            tx.transaction_id === updatedTx.transaction_id ? updatedTx : tx
-          )
-        );
-
-        setSelectedTransaction(null);
-      } else {
-        console.error("Failed to edit transaction");
-      }
-    } catch (error) {
-      console.error("Error editing transaction:", error);
-    }
-  };
 
   const backSign = (e) => {
     e.preventDefault();
@@ -118,25 +72,24 @@ const History = () => {
   };
 
   const getDateLabel = (dateStr) => {
-    const today = new Date();
     const date = new Date(dateStr);
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
-
-    const todayStr = today.toDateString();
-    const yesterdayStr = yesterday.toDateString();
-    const txStr = date.toDateString();
-
-    if (txStr === todayStr) return "Today";
-    if (txStr === yesterdayStr) return "Yesterday";
-    return "Past";
+    return date.toLocaleDateString("en-GB", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
+
+  const labels = Array.from(
+    new Set(transactions.map((tx) => getDateLabel(tx.date)))
+  );
 
   const renderTransactionsByDay = (label) => {
     const filtered = transactions.filter((t) => getDateLabel(t.date) === label);
 
     return filtered.map((item) => {
       const map = categoryMapping[item.category.toLowerCase()];
+      const label = map ?.label;
       const icon = map?.icon;
       const bgColor = map?.bgColor;
       const textColor = item.type === "income" ? "#42AB39" : "#FD3C4A";
@@ -145,7 +98,7 @@ const History = () => {
         <div
           key={item.transaction_id}
           className="flex items-center justify-between bg-[#FCFCFC] p-4 rounded-[24px] w-[335px] h-[89px] mx-[20px] mb-[6px] cursor-pointer"
-          onClick={() => handleItemClick({ ...item, icon, bgColor, textColor })}
+          onClick={() => handleItemClick({ ...item, icon, bgColor, textColor, label })}
         >
           <div className="flex items-center gap-3">
             <div
@@ -175,9 +128,10 @@ const History = () => {
                 : `- Rp ${item.amount.toLocaleString("id-ID")}`}
             </p>
             <p className="text-[#91919F] text-[13px]">
-              {new Date(item.date).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
+              {new Date(item.date).toLocaleDateString("en-GB", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
               })}
             </p>
           </div>
@@ -189,7 +143,7 @@ const History = () => {
   if (!token) return null;
 
   return (
-    <div className="w-[100vw] min-h-[812px]">
+    <div className="w-full max-w-[375px]  h-full max-h-[812px] my-auto">
       {/* Header */}
       <div className="w-[375px] h-[64px] mt-[44px] flex items-center relative">
         <div className="w-[337px] h-[40px] flex items-center justify-between mx-[20px]">
@@ -213,9 +167,9 @@ const History = () => {
       </div>
 
       {/* Sections */}
-      {["Today", "Yesterday", "Past"].map((label) => (
+      {labels.map((label) => (
         <React.Fragment key={label}>
-          <div className="w-full mt-[20px] mx-[20px]">
+          <div className=" mt-[20px] mx-[20px]">
             <p className="font-semibold text-[18px] mb-[8px]">{label}</p>
           </div>
           <div className="flex flex-col">{renderTransactionsByDay(label)}</div>
@@ -257,7 +211,7 @@ const History = () => {
                 />
               </div>
               <p className="ml-[14px] font-semibold text-[24px]">
-                {selectedTransaction.category}
+                {selectedTransaction.label}
               </p>
             </div>
 
@@ -280,7 +234,14 @@ const History = () => {
               </div>
               <div className="flex w-[343px] h-[74px] border border-[#F1F1FA] rounded-[16px] mt-[9px] mx-auto items-center">
                 <div className="ml-[14px] font-[400]">
-                  {new Date(selectedTransaction.date).toLocaleString()}
+                  {new Date(selectedTransaction.date).toLocaleDateString(
+                    "id-ID",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }
+                  )}
                 </div>
               </div>
 
@@ -289,13 +250,11 @@ const History = () => {
                 <button
                   className="w-[160px] h-[56px] rounded-[16px] bg-[#FCAC12] text-white font-semibold text-[18px]"
                   onClick={() => {
-                    setFormData({
-                      amount: selectedTransaction.amount,
-                      description: selectedTransaction.description,
-                      date: selectedTransaction.date.slice(0, 10),
-                      category: selectedTransaction.category,
+                    navigate("/edit", {
+                      state: {
+                        transaction: selectedTransaction, // send full object
+                      },
                     });
-                    setShowEditModal(true);
                   }}
                 >
                   Edit
@@ -307,122 +266,6 @@ const History = () => {
                   Delete
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black/20 z-50 flex justify-center items-center">
-          <div className="bg-white rounded-lg p-6 w-[375px]">
-            <h2 className="text-xl font-semibold mb-4">Edit Transaction</h2>
-            {/* <label>
-              Amount
-              <input
-                type="number"
-                placeholder="Rp ..."
-                value={formData.amount}
-                onChange={(e) =>
-                  setFormData((f) => ({ ...f, amount: e.target.value }))
-                }
-                className="w-full border rounded p-2 mb-3"
-              />
-            </label> */}
-            <label>
-              Amount
-              <input
-                type="text"
-                placeholder="Rp ..."
-                value={
-                  formData.amount
-                    ? `Rp ${Number(formData.amount).toLocaleString("id-ID")}`
-                    : ""
-                }
-                onChange={(e) => {
-                  const raw = e.target.value.replace(/[^\d]/g, ""); // Remove non-digit characters
-                  setFormData((f) => ({
-                    ...f,
-                    amount: raw ? parseInt(raw, 10) : "",
-                  }));
-                }}
-                className="w-full border rounded p-2 mb-3"
-              />
-            </label>
-            <label>
-              Description
-              <input
-                type="text"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData((f) => ({ ...f, description: e.target.value }))
-                }
-                className="w-full border rounded p-2 mb-3"
-              />
-            </label>
-            <label>
-              Date
-              <input
-                type="date"
-                value={formData.date}
-                onChange={(e) =>
-                  setFormData((f) => ({ ...f, date: e.target.value }))
-                }
-                className="w-full border rounded p-2 mb-3"
-              />
-            </label>
-            <label>
-              Category
-              <select
-                value={formData.category}
-                onChange={(e) =>
-                  setFormData((f) => ({ ...f, category: e.target.value }))
-                }
-                className="w-full border rounded p-2 mb-3"
-              >
-                <option value="">-- Select Category --</option>
-
-                {selectedTransaction?.type === "expense" ? (
-                  <>
-                    <option value="shopping">Shopping</option>
-                    <option value="food">Food</option>
-                    <option value="subscription">Subscription</option>
-                    <option value="transportation">Transportation</option>
-                    <option value="entertainment">Entertainment</option>
-                    <option value="other">Other</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="salary">Salary</option>
-                    <option value="pocket money">Pocket Money</option>
-                    <option value="other">Other</option>
-                  </>
-                )}
-              </select>
-            </label>
-
-            <div className="flex justify-between mt-4">
-              <button
-                onClick={() => {
-                  const numericAmount = parseInt(
-                    String(formData.amount).replace(/\./g, ""),
-                    10
-                  );
-                  handleEdit({
-                    ...formData,
-                    amount: numericAmount,
-                  });
-                  setShowEditModal(false);
-                }}
-                className="px-4 py-2 w-24 bg-[#42AB39] text-white rounded"
-              >
-                Save
-              </button>
-
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="px-4 w-24 py-2 border rounded"
-              >
-                Cancel
-              </button>
             </div>
           </div>
         </div>
