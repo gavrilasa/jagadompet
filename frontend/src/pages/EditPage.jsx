@@ -129,10 +129,10 @@ const EditTransactionPage = () => {
     setAmount(
       formData.amount ? Number(formData.amount).toLocaleString("id-ID") : ""
     );
-  }, [formData.amount][(token, navigate)]);
+  }, [(token, navigate)], [formData.amount]);
 
   if (!token) {
-    return null; // Render nothing while redirecting
+    return null;
   }
 
   const handleAmountClick = () => {
@@ -195,7 +195,12 @@ const EditTransactionPage = () => {
 
   const handleDateClick = () => setShowCalendar((prev) => !prev);
   const handleDateChange = (date) => {
-    setFormData((f) => ({ ...f, date: date.toISOString().split("T")[0] }));
+    if (date > new Date()) {
+    setSelectedDate(new Date());
+    } else {
+      setFormData((f) => ({ ...f, date: date.toLocaleDateString("en-CA") }));
+    } 
+
     setShowCalendar(false);
   };
 
