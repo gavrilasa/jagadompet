@@ -26,6 +26,7 @@ const TransactionDetailPage = () => {
   const [description, setDescription] = useState("");
   const todayStr = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState("");
+  
 
   const navigate = useNavigate();
   const backSign = (e) => {
@@ -237,6 +238,7 @@ const handleDateSelect = (date) => {
               const numericAmount = parseInt(amount.replace(/\./g, ""), 10);
 
               const payload = {
+
                 type: "income",
                 category: selectedCategory,
                 amount: numericAmount,
@@ -247,6 +249,7 @@ const handleDateSelect = (date) => {
               try {
                 const result = await fetchWithAuth("/transactions", {
                   method: "POST",
+
                   body: JSON.stringify(payload),
                 });
 

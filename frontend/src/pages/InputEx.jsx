@@ -236,6 +236,7 @@ const TransactionDetailPage = () => {
               const numericAmount = parseInt(amount.replace(/\./g, ""), 10);
 
               const payload = {
+
                 type: "expense",
                 category: selectedCategory,
                 amount: numericAmount,
@@ -248,6 +249,7 @@ const TransactionDetailPage = () => {
                   method: "POST",
                   body: JSON.stringify(payload),
                 });
+
 
                 console.log("Transaction saved:", result);
                 navigate("/dash");

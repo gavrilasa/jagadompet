@@ -127,8 +127,9 @@ const DashboardPage = () => {
             data: last10Days.map((date) => sumMap[date]),
           },
         ]);
-      } catch (err) {
-        setError(err.message);
+      } catch (error) {
+        console.error("Failed to fetch transactions:", error);
+        setError(error.message);
       } finally {
         setLoading(false);
       }
