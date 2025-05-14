@@ -1,125 +1,322 @@
-import React from "react";
-import back from "../images/return.png";
-import shop from "../images/shopbag.png";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from 'react';
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import salary from "../images/category.png";
+import pocket from "../images/category2.png";
+import other from "../images/category3.png";
+import shopping from "../images/shopcat.png";
+import food from "../images/foodcat.png";
+import bills from "../images/billscat.png";
+import transport from "../images/transportcat.png";
+import game from "../images/entcat.png";
+import Calendar from "react-calendar";
+import downgray from "../images/greyarrow.png";
+import "react-calendar/dist/Calendar.css";
+import calendar from "../images/calender.png";
 
-const TransactionDetailPage = () => {
-  const [showPopup, setShowPopup] = useState(false);
-  const token = localStorage.getItem('token');
+const EXPENSE_CATEGORIES = [
+  { value: "shopping", label: "Shopping", icon: shopping, bg: "#FCEED4" },
+  { value: "food", label: "Food", icon: food, bg: "#FDD5D7" },
+  {
+    value: "subscription",
+    label: "Subscription",
+    icon: bills,
+    bg: "#EEE5FF",
+  },
+  {
+    value: "transportation",
+    label: "Transportation",
+    icon: transport,
+    bg: "#D9EBFF",
+  },
+  {
+    value: "entertainment",
+    label: "Entertainment",
+    icon: game,
+    bg: "#FFE0CB",
+  },
+  { value: "other", label: "Other", icon: other, bg: "#E8E8E8" },
+];
 
-  const handleDeleteClick = () => {
-    setShowPopup(true);
-  };
+const INCOME_CATEGORIES = [
+  { value: "salary", label: "Salary", icon: salary, bg: "#CFFAEA" },
+  {
+    value: "pocketmoney",
+    label: "Pocket Money",
+    icon: pocket,
+    bg: "#FFF8D8",
+  },
+  { value: "other", label: "Other", icon: other, bg: "#E8E8E8" },
+];
 
-  const handleCancel = () => {
-    setShowPopup(false);
-  };
+const CategoryDropdown = ({ value, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef();
 
-  const handleConfirmDelete = (e) => {
-    // Aksi logout beneran taruh di sini
-    e.preventDefault();
-    navigate("/");
-  };
-
-  const navigate = useNavigate();
-  const backSign = (e) => {
-    e.preventDefault();
-    navigate("/history");
-  };
- //use effect taroh sini sebelum return
   useEffect(() => {
-        if (!token) {
-          navigate("/login");
-        }
-      }, [token, navigate]);
-    
-      if (!token) {
-        return null; // Render nothing while redirecting
-      }
-    return (
-    <div className="w-full h-full absolute bg-[#FCEED4]">
-      {/* Header with Back Button */}
-      <div className="w-[375px] h-[64px] mt-[44px] flex items-center relative">
-        <div className="w-[337px] h-[40px] flex items-center justify-between mx-[20px]">
-          {/* Back button */}
-          <span className="absolute left-[20px] flex items-center justify-center" onClick={backSign}>
-            <div className="w-[32px] h-[32px] flex items-center justify-center">
-              <img src={back} alt="Back" className="w-[24px]  object-contain" />
+    const handleOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, []);
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  return (
+    <div
+      className="relative w-[343px] flex h-[74px] border-[1px] text-[#91919F] border-[#F1F1FA] rounded-[16px]  items-center cursor-pointer"
+      ref={ref}
+    >
+      <div
+        className={`flex items-center justify-between h-full w-full rounded-[16px] cursor-pointer`}
+        style={{ backgroundColor: selected.bg }}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <div className={`flex items-center ${selected.bg}`}>
+          <img
+            src={selected.icon}
+            alt=""
+            className="w-10 h-10 mr-2 ml-[14px]"
+          />
+          <span className="font-[400] text-[#91919F]">{selected.label}</span>
+        </div>
+        <img src={downgray} alt="" className="w-[32px] h-[32px] mr-[14px]" />
+      </div>
+      {open && (
+        <div className="absolute z-20 mt-1 w-full bg-white border border-[#F1F1FA] rounded-[16px] shadow-lg max-h-60 overflow-auto">
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className="flex items-center p-4 cursor-pointer hover:bg-gray-100"
+              style={{ backgroundColor: opt.bg }}
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
+              }}
+            >
+              <img src={opt.icon} alt="" className="w-6 h-6 mr-2" />
+              <span className="font-[400] text-black">{opt.label}</span>
             </div>
-          </span>
-
-          {/* October Button */}
-          <span className="flex items-center justify-center w-full">
-            <p className="font-semibold text-[18px] text-[#292B2D]">Detail</p>
-          </span>
-        </div>
-      </div>
-      <div className="flex mt-[14px] ml-[16px]">
-        <img src={shop} />
-        <p className="flex ml-[14px] items-center font-semibold text-[24px]">
-          Shopping
-        </p>
-      </div>
-      <div className="mt-[12px] ml-[16px] font-semibold text-[40px] text-[#FD3C4A]">
-        -Rp 12.000
-      </div>
-      <div className="absolute z-10 flex bg-white w-[375px] h-[564px] mt-[23px] rounded-t-[32px] flex-col">
-        <div className="flex w-[343px] h-[74px] border-[1px] border-[#F1F1FA] rounded-[16px] mt-[23px] mx-[16px] items-center">
-          <div className="flex ml-[14px] font-[400]">Sabun Mandi</div>
-        </div>
-        <div className="flex w-[343px] h-[74px] border-[1px] border-[#F1F1FA] rounded-[16px] mt-[9px] mx-[16px] items-center">
-          <div className="flex ml-[14px] font-[400]">12 August 2004</div>
-        </div>
-
-        <div className="flex w-full h-[74px]  mt-[263px] items-center">
-          <div className="flex w-[160px] h-[56px]  ml-[16px] rounded-[16px] bg-[#FCAC12] items-center justify-center text-[18px] text-[#FCFCFC] font-semibold">
-            Edit
-          </div>
-          <div
-            className="flex w-[160px] h-[56px] border-[#FA2F34] border-2 ml-[23px] rounded-[16px] items-center justify-center text-[18px] text-[#FA2F34] font-semibold"
-            onClick={handleDeleteClick}
-          >
-            {" "}
-            Delete{" "}
-          </div>
-        </div>
-      </div>
-
-      {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
-          <div className="bg-white rounded-[21.7px] w-[340px] h-[174.21px] text-center">
-            <div className="m-[13px]">
-              <div className="flex flex-col h-[80px]">
-                <div className="text-[21.7px] font-semibold mb-2 mt-[13px]">
-                  Delete This Transaction?
-                </div>
-                <p className="text-[14.47px] text-[#91919F] font-medium mb-6 ">
-                  Are you sure you want to delete this?
-                </p>
-              </div>
-              <div className="flex justify-between mt-[12px]">
-                <button
-                  onClick={handleCancel}
-                  className="bg-red-100 text-red-500 font-semibold rounded-[15px] w-[148px] h-[50px]"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  onClick={handleConfirmDelete}
-                  className="bg-red-500 text-white font-semibold rounded-[15px] w-[148px] h-[50px]"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       )}
     </div>
   );
 };
 
-export default TransactionDetailPage;
+const EditTransactionPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { transaction: selectedTransaction } = location.state || {};
+  const token = localStorage.getItem("token");
+  const [showCalendar, setShowCalendar] = useState(false);
+
+  const [formData, setFormData] = useState({
+    amount: selectedTransaction?.amount || 0,
+    description: selectedTransaction?.description || "",
+    category: selectedTransaction?.category || "",
+    date: selectedTransaction?.date?.slice(0, 10) || "",
+    type: selectedTransaction?.type || "expense",
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [amount, setAmount] = useState("");
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    }
+    setAmount(
+      formData.amount ? Number(formData.amount).toLocaleString("id-ID") : ""
+    );
+  }, [(token, navigate)], [formData.amount]);
+
+  if (!token) {
+    return null;
+  }
+
+  const handleAmountClick = () => {
+    setIsEditing(true);
+    const formatted = Number(formData.amount || 0).toLocaleString("id-ID");
+    setAmount(formatted);
+  };
+
+  const handleAmountChange = (e) => {
+    let value = e.target.value.replace(/[^\d]/g, "");
+    let formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    setAmount(formattedValue);
+  };
+
+  const handleAmountBlur = () => {
+    setIsEditing(false);
+    const numeric = parseInt(amount.replace(/\./g, ""), 10) || 0;
+    setFormData((f) => ({ ...f, amount: numeric }));
+  };
+
+  const handleEdit = async () => {
+    if (!selectedTransaction) return;
+
+    const updatedFields = {
+      ...formData,
+      amount: parseInt(amount.replace(/\./g, ""), 10),
+    };
+
+    const fullUpdate = {
+      ...selectedTransaction,
+      ...updatedFields,
+    };
+
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/transactions/${selectedTransaction.transaction_id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(fullUpdate),
+        }
+      );
+
+      if (res.ok) {
+        console.log("Transaction updated");
+        navigate(-1); // go back after saving
+      } else {
+        console.error("Failed to update transaction");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
+
+  const options =
+    formData.type === "expense" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
+
+  const handleDateClick = () => setShowCalendar((prev) => !prev);
+  const handleDateChange = (date) => {
+    if (date > new Date()) {
+    setSelectedDate(new Date());
+    } else {
+      setFormData((f) => ({ ...f, date: date.toLocaleDateString("en-CA") }));
+    } 
+
+    setShowCalendar(false);
+  };
+
+  return (
+    <div
+      className={`w-full min-h-screen  flex flex-col relative overflow-hidden ${
+        formData.type === "income" ? "bg-[#00C153]" : "bg-red-500"
+      }`}
+    >
+      {/* Header */}
+      <div className="w-full h-[64px] mt-[44px] flex items-center justify-center relative">
+        <p className="font-semibold text-[18px] text-white">Edit</p>
+      </div>
+      <div className="flex flex-col mt-[40px] px-[26px]">
+        <p className="font-semibold text-[18px] leading-[100%] text-white/80">
+          How much?
+        </p>
+        <div
+          className="text-4xl text-white font-bold cursor-pointer mt-3"
+          onClick={handleAmountClick}
+        >
+          {isEditing ? (
+            <input
+              placeholder="Rp ..."
+              type="text"
+              value={amount}
+              onChange={handleAmountChange}
+              onBlur={handleAmountBlur}
+              autoFocus
+              className="bg-transparent border-none  text-white outline-none w-full"
+            />
+          ) : (
+            `Rp ${amount || "0"}`
+          )}
+        </div>
+      </div>
+
+      {/* Form */}
+      <div
+        className={`absolute w-full bg-white rounded-t-[32px] mt-[250px] flex flex-col items-center transition-all duration-300 h-[562px]
+        }`}
+      >
+        {/* Category */}
+
+        <label className="block mb-4 mt-8">
+          <span className="text-xl font-medium block mb-2">Category</span>
+          <CategoryDropdown
+            value={formData.category}
+            onChange={(val) => setFormData((f) => ({ ...f, category: val }))}
+            options={options}
+          />
+        </label>
+
+        {/* Description */}
+        <label className="block mb-4">
+          <span className="text-xl mt-2 block">Description</span>
+          <div className="flex w-[343px]  h-[74px] border  text-[#91919F]/200  border-[#F1F1FA] rounded-[16px] items-center">
+            <input
+              type="text"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData((f) => ({ ...f, description: e.target.value }))
+              }
+              className="flex ml-[14px] font-[400] border-none outline-none"
+            />
+          </div>
+        </label>
+
+        {/* Date */}
+        <label className="block mb-6 relative">
+          <span className="text-xl mt-2 font-medium block">Date</span>
+          <div
+            onClick={handleDateClick}
+            className="w-[343px] flex h-[74px] border border-[#F1F1FA] rounded-[16px] text-[#91919F] items-center cursor-pointer"
+          >
+            <div className="flex ml-[14px] font-[400]">
+              {formData.date || "Select date"}
+            </div>
+            <div className="flex w-[32px] h-[32px] ml-auto mr-[14px] items-center justify-center">
+              <img src={calendar} alt="" />
+            </div>
+          </div>
+
+          {showCalendar && (
+            <div className="absolute z-10 mt-[-360px] ml-[-4px]">
+              <Calendar
+                onChange={handleDateChange}
+                value={new Date(formData.date)}
+                activeStartDate={new Date()}
+                className="shadow-lg rounded-lg overflow-hidden"
+              />
+            </div>
+          )}
+        </label>
+
+        {/* Buttons */}
+        <div className="flex mt-7">
+          <button
+            onClick={handleEdit}
+            className={`w-38 mr-8 h-14 py-2 rounded-lg text-white font-medium ${
+              formData.type === "income" ? "bg-[#00C153]" : "bg-red-500"
+            }`}
+          >
+            Save Changes
+          </button>
+
+          <button
+            onClick={() => navigate(-1)}
+            className="w-38 bg-gray-200 text-black py-2 rounded-lg font-medium"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default EditTransactionPage;

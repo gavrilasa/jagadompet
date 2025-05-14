@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import graph from "../images/graph.png";
 import pp from "../images/pp.png";
 import inc from "../images/income.png";
 import exp from "../images/expense.png";
@@ -7,30 +6,27 @@ import shop from "../images/shopbag.png";
 import down from "../images/downhome.png";
 import { useNavigate } from "react-router-dom";
 import { categoryMapping } from "../components/Dropdown";
-import Chart from 'react-apexcharts';
-
+import Chart from "react-apexcharts";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
 
   const [chartOptions, setChartOptions] = useState({
     chart: {
-      id: 'spend-frequency',
-      toolbar: { show: false }
+      id: "spend-frequency",
+      toolbar: { show: false },
     },
     xaxis: {
-      categories: [],          // we’ll fill this with the last 10 dates
-      labels: { rotate: -45 }
+      categories: [],
+      labels: { rotate: -45 },
     },
-    yaxis: {
-      
-    },
-    stroke: { curve: 'smooth' },
-    dataLabels: { enabled: false }
+    yaxis: {},
+    stroke: { curve: "smooth" },
+    dataLabels: { enabled: false },
   });
   const [chartSeries, setChartSeries] = useState([
-    { name: 'Transactions', data: [] }
-  ]);  
+    { name: "Transactions", data: [] },
+  ]);
 
   const handleExpense = (e) => {
     e.preventDefault();
@@ -49,7 +45,7 @@ const DashboardPage = () => {
   const handleProfile = (e) => {
     e.preventDefault();
     navigate("/logout");
-  }
+  };
 
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +53,6 @@ const DashboardPage = () => {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
   const [balance, setBalance] = useState(0);
-  
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -84,39 +79,42 @@ const DashboardPage = () => {
         setTotalExpense(expense);
         setBalance(income - expense);
 
-       
         const today = new Date();
         const last10Days = Array.from({ length: 10 }).map((_, i) => {
           const d = new Date(today);
           d.setDate(today.getDate() - (9 - i));
-          return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }); 
+          return d.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+          });
         });
 
-        
         const sumMap = last10Days.reduce((acc, date) => {
           acc[date] = 0;
           return acc;
-        }, {});        
-        data.forEach(tx => {
-          if (tx.type !== 'expense') return;       // ignore income
-          const localKey = new Date(tx.date)
-          .toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+        }, {});
+        data.forEach((tx) => {
+          if (tx.type !== "expense") return; // ignore income
+          const localKey = new Date(tx.date).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+          });
           if (sumMap[localKey] !== undefined) {
-            sumMap[localKey] += tx.amount;         // add amt instead of ++
+            sumMap[localKey] += tx.amount; // add amt instead of ++
           }
         });
-        
 
-        // 3) update chart state
-        const maxValue = Math.max(...last10Days.map(date => sumMap[date] || 0));
+        const maxValue = Math.max(
+          ...last10Days.map((date) => sumMap[date] || 0)
+        );
         const roundedMax = Math.ceil(maxValue / 100000) * 100000 || 100000;
-        setChartOptions(opts => ({
+        setChartOptions((opts) => ({
           ...opts,
-          xaxis: { 
-            ...opts.xaxis, 
-            categories: last10Days 
+          xaxis: {
+            ...opts.xaxis,
+            categories: last10Days,
           },
-          colors: ['#42AB39'], 
+          colors: ["#FA2F34"],
           yaxis: {
             min: 0,
             max: roundedMax,
@@ -126,13 +124,12 @@ const DashboardPage = () => {
             },
           },
         }));
-        setChartSeries([{
-          name: 'Expense Amount',
-          data: last10Days.map(date => sumMap[date])
-        }]);
-        
-
-
+        setChartSeries([
+          {
+            name: "Expense Amount",
+            data: last10Days.map((date) => sumMap[date]),
+          },
+        ]);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -149,7 +146,10 @@ const DashboardPage = () => {
         {/* Header */}
         <div className="w-[375px] h-[64px]  mt-[44px] flex justify-center items-center">
           <div className="w-[337px] h-[40px] flex items-center justify-between">
-            <div className="w-[38px] h-[38px] bg-gray-300 rounded-full" onClick={handleProfile}>
+            <div
+              className="w-[38px] h-[38px] bg-gray-300 rounded-full"
+              onClick={handleProfile}
+            >
               <img src={pp} alt="profile" />
             </div>
             <button className="text-[14px] w-[107px] h-[40px] bg-transparent border border-[#42AB39] rounded-[40px] font-medium flex items-center justify-center">
@@ -224,15 +224,6 @@ const DashboardPage = () => {
             />
           </div>
         </div>
-        {/* <div className="w-[375px] h-[48px] items-center flex mt-[24px]">
-          <p className="pl-[20px] font-semibold text-[18px] leading-[100%]">
-            Spend Frequency
-          </p>
-        </div>
-        <div className="mb-[28px] mt-[10px] flex items-center justify-center">
-          <img src={graph} alt="graph" />
-        </div> */}
-
         {/* Recent Transaction Header */}
         <div className="w-[375px] h-[48px] items-center flex mt-[24px] mb-3">
           <p className="pl-[20px] font-semibold text-[18px] leading-[100%]">
@@ -247,7 +238,7 @@ const DashboardPage = () => {
         </div>
 
         {/* Transaction List */}
-        <div className="flex flex-col gap-[6px]">
+        <div className="flex flex-col gap-[6px]" onClick={handleHistory}>
           {loading && <p className="text-center">Loading transactions...</p>}
           {error && <p className="text-center text-red-500">{error}</p>}
           {!loading && !error && transactions.length === 0 && (
@@ -256,18 +247,21 @@ const DashboardPage = () => {
           {!loading &&
             !error &&
             transactions
+
               .filter((tx) => {
                 if (!tx.date) return false;
 
                 const txDate = new Date(tx.date);
                 const today = new Date();
-              
-                return (
-                  txDate.getFullYear() === today.getFullYear() &&
-                  txDate.getMonth() === today.getMonth() &&
-                  txDate.getDate() === today.getDate()
-                );
+
+                txDate.setHours(0, 0, 0, 0);
+                today.setHours(0, 0, 0, 0);
+
+                const isToday = txDate.getTime() === today.getTime();
+
+                return isToday;
               })
+
               .map((tx) => {
                 const categoryKey = tx.category?.toLowerCase?.() || "";
                 const map = categoryMapping[categoryKey] || {};
@@ -311,9 +305,10 @@ const DashboardPage = () => {
                           : `-Rp ${formattedAmount}`}
                       </p>
                       <p className="text-[#91919F] text-[13px]">
-                        {new Date(tx.date).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
+                        {new Date(tx.date).toLocaleDateString("en-GB", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
                         })}
                       </p>
                     </div>

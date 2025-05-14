@@ -10,8 +10,8 @@ import transport from "../images/transportcat.png";
 import game from "../images/entcat.png";
 import other from "../images/category3.png";
 import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css"; // Untuk styling kalender
-import { useEffect } from 'react';
+import "react-calendar/dist/Calendar.css";
+import { useEffect } from "react";
 
 const TransactionDetailPage = () => {
   const [amount, setAmount] = useState("");
@@ -24,8 +24,9 @@ const TransactionDetailPage = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [category, setCategory] = useState("");
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
   const [description, setDescription] = useState("");
+  const todayStr = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState("");
 
   const navigate = useNavigate();
@@ -72,9 +73,13 @@ const TransactionDetailPage = () => {
   };
 
   const handleDateSelect = (date) => {
+  if (date > new Date()) {
+    setSelectedDate(new Date());
+  } else {
     setSelectedDate(date);
-    setShowCalendar(false);
-  };
+  }
+  setShowCalendar(false);
+};
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
@@ -85,17 +90,17 @@ const TransactionDetailPage = () => {
   };
 
   const isButtonEnabled = amount && selectedCategory && selectedDate;
-   useEffect(() => {
-        if (!token) {
-          navigate("/login");
-        }
-      }, [token, navigate]);
-    
-      if (!token) {
-        return null; // Render nothing while redirecting
-      }
-    
-    return (
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    }
+  }, [token, navigate]);
+
+  if (!token) {
+    return null; // Render nothing while redirecting
+  }
+
+  return (
     <div className="w-full min-h-screen bg-[#FA2F34] flex flex-col relative overflow-hidden">
       {/* Header */}
       <div className="w-full h-[64px] mt-[44px] flex items-center justify-center relative">
@@ -154,7 +159,9 @@ const TransactionDetailPage = () => {
                   className="w-[40px] h-[40px] ml-[16px]"
                 />
                 <span className="text-[#292B2D] font-medium text-[16px]  ml-[8px]">
-                  {selectedCategory === "food" ? "Food & Beverages" : selectedCategory}
+                  {selectedCategory === "food"
+                    ? "Food & Beverages"
+                    : selectedCategory}
                 </span>
               </div>
             ) : (
@@ -187,6 +194,7 @@ const TransactionDetailPage = () => {
           <div
             value={date}
             onChange={handleDateChange}
+            max={todayStr}
             className="flex ml-[14px] items-center font-[400]"
           >
             {selectedDate ? (
@@ -225,23 +233,26 @@ const TransactionDetailPage = () => {
             disabled={!isButtonEnabled}
             onClick={async () => {
               const numericAmount = parseInt(amount.replace(/\./g, ""), 10);
-          
+
               const payload = {
-                user_id: 1, // Replace with real user ID from auth or context
-                type: "expense", // or "expense"
+                user_id: 1,
+                type: "expense",
                 category: selectedCategory,
                 amount: numericAmount,
                 date: selectedDate,
                 description: description,
               };
-          
+
               try {
-                const res = await fetch("http://localhost:5000/api/transactions", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(payload),
-                });
-          
+                const res = await fetch(
+                  "http://localhost:5000/api/transactions",
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                  }
+                );
+
                 if (res.ok) {
                   const result = await res.json();
                   console.log("Transaction saved:", result);
@@ -295,11 +306,7 @@ const TransactionDetailPage = () => {
 
               <div
                 onClick={() =>
-                  handleCategorySelect(
-                    "Subscription",
-                    bills,
-                    "bg-[#EEE5FF]"
-                  )
+                  handleCategorySelect("Subscription", bills, "bg-[#EEE5FF]")
                 }
                 className="flex w-[343px] pl-[8px] h-[74px] border-[1px] text-[#91919F] border-[#F1F1FA] rounded-[16px]  mt-[16px] items-center"
               >

@@ -24,6 +24,7 @@ const TransactionDetailPage = () => {
   const [category, setCategory] = useState("");
   const token = localStorage.getItem('token');
   const [description, setDescription] = useState("");
+  const todayStr = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState("");
 
   const navigate = useNavigate();
@@ -69,11 +70,14 @@ const TransactionDetailPage = () => {
     setShowCalendar(!showCalendar);
   };
 
-  const handleDateSelect = (date) => {
+const handleDateSelect = (date) => {
+  if (date > new Date()) {
+    setSelectedDate(new Date());
+  } else {
     setSelectedDate(date);
-    setShowCalendar(false);
-    
-  };
+  }
+  setShowCalendar(false);
+};
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
@@ -191,6 +195,7 @@ const TransactionDetailPage = () => {
           <div
             value={date}
             onChange={handleDateChange}
+            max={todayStr}
             className="flex ml-[14px] items-center font-[400]"
           >
             {selectedDate ? (

@@ -10,6 +10,7 @@ const LogoutPage = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const user_id = localStorage.getItem("user_id");
+  const [username, setUsername] = useState("");
 
   const [showPopup, setShowPopup] = useState(false);
 
@@ -25,10 +26,15 @@ const LogoutPage = () => {
     e.preventDefault();
     localStorage.removeItem("token", token);
     localStorage.removeItem("user_id", user_id);
+    localStorage.removeItem("username", username);
     navigate("/");
   };
 
   useEffect(() => {
+    const nameFromStorage = localStorage.getItem("username");
+     if (nameFromStorage) {
+      setUsername(nameFromStorage);
+    }
     if (!token) {
       navigate("/login");
     }
@@ -66,11 +72,11 @@ const LogoutPage = () => {
           </p>
           <div className="flex items-center">
             <p className="mt-[7px] leading-[100%] font-semibold text-[24px] text-[#161719] ml-[16px]">
-              John Doe
+               {username} 
             </p>
-            <span className="ml-[193px] border border-[#F1F1FA] w-[40px] h-[40px] rounded-[8px] flex items-center justify-center">
+            {/* <span className="ml-[193px] border border-[#F1F1FA] w-[40px] h-[40px] rounded-[8px] flex items-center justify-center">
               <LuPen className="text-[24px] text-black" />
-            </span>
+            </span> */}
           </div>
           <div className="w-full flex  justify-center mt-[287px]">
             <button
