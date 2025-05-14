@@ -2,8 +2,6 @@ import { body, validationResult } from "express-validator";
 import mongoose from "mongoose";
 
 const validateTransaction = [
-  body("user_id")
-    .isNumeric(),
   body("type")
     .isIn(["income", "expense"])
     .withMessage("Type must be 'income' or 'expense'"),
@@ -12,9 +10,7 @@ const validateTransaction = [
     .isFloat({ gt: 0 })
     .withMessage("Amount must be a number greater than 0"),
 
-  body("category")
-    .notEmpty()
-    .withMessage("Category is required"),
+  body("category").notEmpty().withMessage("Category is required"),
 
   body("date")
     .optional()

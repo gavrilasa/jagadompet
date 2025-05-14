@@ -3,7 +3,10 @@ import Transaction from "../models/transaction.model.js";
 // Create a new transaction
 export async function createTransaction(req, res) {
   try {
-    const transaction = new Transaction(req.body);
+    const transaction = new Transaction({
+      ...req.body,
+      user_id: req.user.user_id, // Use the authenticated user's ID
+    });
     await transaction.save();
     res.status(201).json(transaction);
   } catch (err) {
@@ -11,10 +14,12 @@ export async function createTransaction(req, res) {
   }
 }
 
-// Get all transactions
+// Get all transactions for the authenticated user
 export async function getTransactions(req, res) {
   try {
-    const transactions = await Transaction.find().sort({ date: -1 });
+    const transactions = await Transaction.find({
+      user_id: req.user.user_id,
+    }).sort({ date: -1 });
     res.json(transactions);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch transactions." });
@@ -25,7 +30,10 @@ export async function getTransactions(req, res) {
 export async function updateTransaction(req, res) {
   try {
     const transaction = await Transaction.findOneAndUpdate(
-      { transaction_id: req.params.id },  // use custom field here
+      {
+        transaction_id: req.params.id,
+        user_id: req.user.user_id, // Ensure user owns the transaction
+      },
       req.body,
       { new: true }
     );
@@ -40,12 +48,14 @@ export async function updateTransaction(req, res) {
   }
 }
 
-
 // Delete a transaction by ID
 export async function deleteTransaction(req, res) {
   try {
-    const deleted = await Transaction.findOneAndDelete(
-      { transaction_id: req.params.id });
+    const deleted = await Transaction.findOneAndDelete({
+      transaction_id: req.params.id,
+      user_id: req.user.user_id, // Ensure user owns the transaction
+    });
+
     if (!deleted) {
       return res.status(404).json({ error: "Transaction not found." });
     }
@@ -58,22 +68,20 @@ export async function deleteTransaction(req, res) {
 // Get income, expense, and balance summary
 export async function getSummary(req, res) {
   try {
-    const user_id = Number(req.body.user_id); // konversi string ke number
-
     const [income] = await Transaction.aggregate([
-      { $match: { user_id: user_id, type: "income" } },
-      { $group: { _id: null, total: { $sum: "$amount" } } }
+      { $match: { user_id: req.user.user_id, type: "income" } },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
     const [expense] = await Transaction.aggregate([
-      { $match: { user_id: user_id, type: "expense" } },
-      { $group: { _id: null, total: { $sum: "$amount" } } }
+      { $match: { user_id: req.user.user_id, type: "expense" } },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
     res.json({
       totalIncome: income?.total || 0,
       totalExpense: expense?.total || 0,
-      balance: (income?.total || 0) - (expense?.total || 0)
+      balance: (income?.total || 0) - (expense?.total || 0),
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch summary." });
@@ -83,35 +91,33 @@ export async function getSummary(req, res) {
 // Get spending frequency (e.g., total expense per day)
 export async function getSpendFrequency(req, res) {
   try {
-    const user_id = Number(req.body.user_id); // ambil dari query parameter
-
     const result = await Transaction.aggregate([
       {
         $match: {
-          user_id: user_id,
-          type: "expense"
-        }
+          user_id: req.user.user_id,
+          type: "expense",
+        },
       },
       {
         $group: {
           _id: {
-            $dateToString: { format: "%Y-%m-%d", date: "$date" }
+            $dateToString: { format: "%Y-%m-%d", date: "$date" },
           },
-          total: { $sum: "$amount" }
-        }
+          total: { $sum: "$amount" },
+        },
       },
       {
-        $sort: { _id: 1 } // urutkan berdasarkan tanggal naik
-      }
+        $sort: { _id: 1 },
+      },
     ]);
 
-    res.json(result.map(item => ({
-      date: item._id,
-      total: item.total
-    })));
+    res.json(
+      result.map((item) => ({
+        date: item._id,
+        total: item.total,
+      }))
+    );
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch spend frequency." });
   }
 }
-
-

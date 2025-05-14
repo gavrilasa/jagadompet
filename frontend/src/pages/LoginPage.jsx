@@ -35,31 +35,11 @@ const LoginPage = () => {
       }
 
       const data = await res.json();
-      const { token, user } = data;
-      const userId = user.id;
-     
-      localStorage.setItem("token", token);
-      localStorage.setItem("user_id", userId);
 
-      // Step 3: Fetch protected profile
-      const profileRes = await fetch("http://localhost:5000/api/auth/profile", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Store token and user data
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-      if (!profileRes.ok) {
-        const profileErr = await profileRes.json();
-        alert("Failed to fetch profile: " + profileErr.message);
-        return;
-      }
-
-      const profile = await profileRes.json();
-      console.log("User profile:", profile);
-      localStorage.setItem("username", profile.user.name);
-
-      // Step 4: Navigate to protected route
       navigate("/view");
     } catch (error) {
       alert("Error connecting to server: " + error.message);
@@ -121,7 +101,7 @@ const LoginPage = () => {
               Login
             </button>
             <div className="text-center text-[#91919F] cursor-pointer">
-              Don’t have an account yet?{" "}
+              Don't have an account yet?{" "}
               <a className="text-[#42AB39] underline" onClick={handleSign}>
                 Sign Up
               </a>
