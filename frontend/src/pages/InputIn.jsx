@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { fetchWithAuth } from "../utils/api";
 
-
 const TransactionDetailPage = () => {
   const [amount, setAmount] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -92,17 +91,16 @@ const handleDateSelect = (date) => {
   const isButtonEnabled = amount && selectedCategory && selectedDate;
 
   useEffect(() => {
-        if (!token) {
-          navigate("/login");
-        }
-      }, [token, navigate]);
-    
-      if (!token) {
-        return null; // Render nothing while redirecting
-      }
-      
-    
-    return (
+    if (!token) {
+      navigate("/login");
+    }
+  }, [token, navigate]);
+
+  if (!token) {
+    return null; // Render nothing while redirecting
+  }
+
+  return (
     <div className="w-full min-h-screen bg-[#00C153] flex flex-col relative overflow-hidden">
       {/* Header */}
       <div
@@ -164,7 +162,9 @@ const handleDateSelect = (date) => {
                   className="w-[40px] h-[40px] ml-[16px]"
                 />
                 <span className="text-[#292B2D] font-medium text-[16px]  ml-[8px]">
-                  {selectedCategory === "pocketmoney" ? "Pocket Money" : selectedCategory}
+                  {selectedCategory === "pocketmoney"
+                    ? "Pocket Money"
+                    : selectedCategory}
                 </span>
               </div>
             ) : (
@@ -236,23 +236,23 @@ const handleDateSelect = (date) => {
             disabled={!isButtonEnabled}
             onClick={async () => {
               const numericAmount = parseInt(amount.replace(/\./g, ""), 10);
-          
+
               const payload = {
-                
-                type: "income", // or "expense"
+
+                type: "income",
                 category: selectedCategory,
                 amount: numericAmount,
                 date: selectedDate,
                 description: description,
               };
-          
+
               try {
                 const result = await fetchWithAuth("/transactions", {
                   method: "POST",
-          
+
                   body: JSON.stringify(payload),
                 });
-          
+
                 console.log("Transaction saved:", result);
                 navigate("/dash");
               } catch (err) {

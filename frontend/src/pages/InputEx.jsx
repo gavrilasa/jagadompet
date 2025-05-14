@@ -10,7 +10,7 @@ import transport from "../images/transportcat.png";
 import game from "../images/entcat.png";
 import other from "../images/category3.png";
 import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import "react-calendar/dist/Calendar.css"; // Untuk styling kalender
 import { useEffect } from "react";
 import { fetchWithAuth } from "../utils/api";
 
@@ -236,7 +236,7 @@ const TransactionDetailPage = () => {
               const numericAmount = parseInt(amount.replace(/\./g, ""), 10);
 
               const payload = {
-                
+
                 type: "expense",
                 category: selectedCategory,
                 amount: numericAmount,
@@ -245,13 +245,11 @@ const TransactionDetailPage = () => {
               };
 
               try {
-                const result = await fetchWithAuth("/transactions",
-                  {
-                    method: "POST",
-                    
-                    body: JSON.stringify(payload),
-                  }
-                );
+                const result = await fetchWithAuth("/transactions", {
+                  method: "POST",
+                  body: JSON.stringify(payload),
+                });
+
 
                 console.log("Transaction saved:", result);
                 navigate("/dash");
