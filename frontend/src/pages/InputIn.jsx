@@ -8,7 +8,8 @@ import other from "../images/category3.png";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css"; // Untuk styling kalender
 import { useNavigate } from "react-router-dom";
-import { useEffect } from 'react';
+import { useEffect } from "react";
+import { fetchWithAuth } from "../utils/api";
 
 
 const TransactionDetailPage = () => {
@@ -22,10 +23,11 @@ const TransactionDetailPage = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [category, setCategory] = useState("");
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
   const [description, setDescription] = useState("");
   const todayStr = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState("");
+  
 
   const navigate = useNavigate();
   const backSign = (e) => {
@@ -236,7 +238,7 @@ const handleDateSelect = (date) => {
               const numericAmount = parseInt(amount.replace(/\./g, ""), 10);
           
               const payload = {
-                user_id: 1, // Replace with real user ID from auth or context
+                
                 type: "income", // or "expense"
                 category: selectedCategory,
                 amount: numericAmount,
@@ -245,22 +247,17 @@ const handleDateSelect = (date) => {
               };
           
               try {
-                const res = await fetch("http://localhost:5000/api/transactions", {
+                const result = await fetchWithAuth("/transactions", {
                   method: "POST",
-                  headers: { "Content-Type": "application/json" },
+          
                   body: JSON.stringify(payload),
                 });
           
-                if (res.ok) {
-                  const result = await res.json();
-                  console.log("Transaction saved:", result);
-                  navigate("/dash"); // Go back to dashboard or show success message
-                } else {
-                  const err = await res.json();
-                  console.error("Server error:", err);
-                }
+                console.log("Transaction saved:", result);
+                navigate("/dash");
               } catch (err) {
                 console.error("Request failed:", err);
+                alert(err.message);
               }
             }}
           >

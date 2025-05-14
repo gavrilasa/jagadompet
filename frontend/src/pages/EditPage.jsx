@@ -114,22 +114,28 @@ const EditTransactionPage = () => {
   const [formData, setFormData] = useState({
     amount: selectedTransaction?.amount || 0,
     description: selectedTransaction?.description || "",
-    category: selectedTransaction?.category || "",
-    date: selectedTransaction?.date?.slice(0, 10) || "",
+    category: selectedTransaction?.category?.toLowerCase() || "",
+    date: selectedTransaction?.date
+      ? new Date(selectedTransaction.date).toLocaleDateString("id-ID")
+      : "",
     type: selectedTransaction?.type || "expense",
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const [amount, setAmount] = useState("");
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/login");
-    }
-    setAmount(
-      formData.amount ? Number(formData.amount).toLocaleString("id-ID") : ""
-    );
-  }, [(token, navigate)], [formData.amount]);
+  useEffect(
+    () => {
+      if (!token) {
+        navigate("/login");
+      }
+      setAmount(
+        formData.amount ? Number(formData.amount).toLocaleString("id-ID") : ""
+      );
+    },
+    [(token, navigate)],
+    [formData.amount]
+  );
 
   if (!token) {
     return null;
@@ -196,10 +202,10 @@ const EditTransactionPage = () => {
   const handleDateClick = () => setShowCalendar((prev) => !prev);
   const handleDateChange = (date) => {
     if (date > new Date()) {
-    setSelectedDate(new Date());
+      setSelectedDate(new Date());
     } else {
-      setFormData((f) => ({ ...f, date: date.toLocaleDateString("en-CA") }));
-    } 
+      setFormData((f) => ({ ...f, date: date.toLocaleDateString("en-GB") }));
+    }
 
     setShowCalendar(false);
   };
@@ -288,7 +294,7 @@ const EditTransactionPage = () => {
             <div className="absolute z-10 mt-[-360px] ml-[-4px]">
               <Calendar
                 onChange={handleDateChange}
-                value={new Date(formData.date)}
+                value={formData.date ? new Date(formData.date + "T00:00:00") : new Date()}
                 activeStartDate={new Date()}
                 className="shadow-lg rounded-lg overflow-hidden"
               />

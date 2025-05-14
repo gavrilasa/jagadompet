@@ -12,6 +12,7 @@ import other from "../images/category3.png";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { useEffect } from "react";
+import { fetchWithAuth } from "../utils/api";
 
 const TransactionDetailPage = () => {
   const [amount, setAmount] = useState("");
@@ -235,7 +236,7 @@ const TransactionDetailPage = () => {
               const numericAmount = parseInt(amount.replace(/\./g, ""), 10);
 
               const payload = {
-                user_id: 1,
+                
                 type: "expense",
                 category: selectedCategory,
                 amount: numericAmount,
@@ -244,25 +245,19 @@ const TransactionDetailPage = () => {
               };
 
               try {
-                const res = await fetch(
-                  "http://localhost:5000/api/transactions",
+                const result = await fetchWithAuth("/transactions",
                   {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    
                     body: JSON.stringify(payload),
                   }
                 );
 
-                if (res.ok) {
-                  const result = await res.json();
-                  console.log("Transaction saved:", result);
-                  navigate("/dash"); // Go back to dashboard or show success message
-                } else {
-                  const err = await res.json();
-                  console.error("Server error:", err);
-                }
+                console.log("Transaction saved:", result);
+                navigate("/dash");
               } catch (err) {
                 console.error("Request failed:", err);
+                alert(err.message);
               }
             }}
           >

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { categoryMapping } from "../components/Dropdown";
+import { fetchWithAuth } from "../utils/api";
 
 const History = () => {
   const navigate = useNavigate();
@@ -21,12 +22,7 @@ const History = () => {
 
   const fetchTransactions = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/transactions", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
+      const data = await fetchWithAuth("/transactions");
       setTransactions(data);
     } catch (err) {
       console.error("Failed to fetch transactions:", err);

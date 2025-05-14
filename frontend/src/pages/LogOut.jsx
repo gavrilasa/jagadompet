@@ -9,7 +9,7 @@ import { useEffect } from "react";
 const LogoutPage = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const user_id = localStorage.getItem("user_id");
+  const user = localStorage.getItem("user");
   const [username, setUsername] = useState("");
 
   const [showPopup, setShowPopup] = useState(false);
@@ -25,15 +25,19 @@ const LogoutPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     localStorage.removeItem("token", token);
-    localStorage.removeItem("user_id", user_id);
-    localStorage.removeItem("username", username);
+    localStorage.removeItem("user", user);
     navigate("/");
   };
 
   useEffect(() => {
-    const nameFromStorage = localStorage.getItem("username");
-     if (nameFromStorage) {
-      setUsername(nameFromStorage);
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        setUsername(user.name); // Set username from name field
+      } catch (err) {
+        console.error("Failed to parse user data:", err);
+      }
     }
     if (!token) {
       navigate("/login");
