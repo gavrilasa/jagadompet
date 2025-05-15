@@ -3,6 +3,7 @@ import car1 from "../images/car1.png";
 import car2 from "../images/car2.png";
 import car3 from "../images/car3.png";
 import { useNavigate } from "react-router-dom";
+import { apiClient } from "../utils/apiClient";
 
 const Carousel = () => {
   const navigate = useNavigate();
@@ -25,11 +26,12 @@ const Carousel = () => {
     navigate("/sign");
   };
   const handleLogin = (e) => {
-    e.preventDefault();
     navigate("/login");
   };
 
   const [index, setIndex] = useState(0);
+  const [slowNetwork, setSlowNetwork] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,8 +41,72 @@ const Carousel = () => {
     return () => clearInterval(interval);
   }, [images.length]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    (async () => {
+      const { error: err, slowNetwork: isSlow } = await apiClient(
+        "/api/auth/session",
+        // "http://localhost:5000/wrong-url",
+        { method: "GET" },
+        1000
+      );
+
+      if (!isMounted) return;
+      if (!navigator.onLine) {
+        setError(true);
+        setSlowNetwork(false);
+        return;
+      }
+
+      // 2) Else if it timed out, mark slow network
+      if (isSlow) {
+        setSlowNetwork(true);
+        setError(false);
+        return;
+      }
+
+      // 3) Any other fetch error (e.g. CORS, DNS)
+      if (err) {
+        setError(true);
+        setSlowNetwork(false);
+        return;
+      }
+
+      // 4) Otherwise, clear both flags
+      setError(false);
+      setSlowNetwork(false);
+      // you could also handle error !== null if you want to detect backend down
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
-    <div className="relative w-full max-w-[375px] mx-auto">
+    <div className="relative w-full max-w-[375px] h-screen mx-auto">
+      {/* Slow network warning */}
+      {/* Slow-network modal overlay */}
+      {slowNetwork && (
+        <div className="fixed inset-0 bg-opacity-50 flex h-25 justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 max-w-xs text-center shadow-xl">
+            <p className="text-yellow-800 font-semibold mb-2">
+              ⚠️ Slow Network Detected
+            </p>
+            <p className="text-gray-600 text-sm">
+              Some features may not load optimally until your connection
+              improves.
+            </p>
+          </div>
+        </div>
+      )}
+      {/* Offline error banner (you can style as you like) */}
+      {error && !slowNetwork && (
+        <div className="fixed top-0 text font-bold left-0 w-full h-full flex justify-center items-center bg-[#FA2F34] text-white py-2 text-center z-50">
+          🚫 You appear to be offline or the server is unreachable.
+        </div>
+      )}
       <div className="overflow-hidden rounded-lg">
         <img
           src={images[index]}
