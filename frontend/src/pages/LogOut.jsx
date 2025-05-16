@@ -6,15 +6,16 @@ import back from "../images/return.png";
 import { useState } from "react";
 import { useEffect } from "react";
 
+
 const LogoutPage = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("user");
 
 
-  const [username, setUsername] = useState("");
-  
+
   const [showPopup, setShowPopup] = useState(false);
+  const [username, setUsername] = useState("");
 
   const handleLogoutClick = () => {
     setShowPopup(true);
@@ -54,8 +55,10 @@ const LogoutPage = () => {
     navigate("/dash");
   };
 
+
   return (
     <div className="relative w-full h-screen">
+      
       <div className="absolute z-10 w-full flex min-h-screen justify-center ">
         <div>
           {/* Header */}
@@ -80,9 +83,6 @@ const LogoutPage = () => {
             <p className="mt-[7px] leading-[100%] font-semibold text-[24px] text-[#161719] ml-[16px]">
                {username} 
             </p>
-            {/* <span className="ml-[193px] border border-[#F1F1FA] w-[40px] h-[40px] rounded-[8px] flex items-center justify-center">
-              <LuPen className="text-[24px] text-black" />
-            </span> */}
           </div>
           <div className="w-full flex  justify-center mt-[287px]">
             <button

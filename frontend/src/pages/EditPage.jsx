@@ -111,12 +111,20 @@ const EditTransactionPage = () => {
   const token = localStorage.getItem("token");
   const [showCalendar, setShowCalendar] = useState(false);
 
+  const formatToLocalDate = (dateString) => {
+    const d = new Date(dateString);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const [formData, setFormData] = useState({
     amount: selectedTransaction?.amount || 0,
     description: selectedTransaction?.description || "",
     category: selectedTransaction?.category?.toLowerCase() || "",
     date: selectedTransaction?.date
-      ? new Date(selectedTransaction.date).toLocaleDateString("id-ID")
+      ? formatToLocalDate(selectedTransaction.date)
       : "",
     type: selectedTransaction?.type || "expense",
   });
@@ -204,7 +212,7 @@ const EditTransactionPage = () => {
     if (date > new Date()) {
       setSelectedDate(new Date());
     } else {
-      setFormData((f) => ({ ...f, date: date.toLocaleDateString("en-GB") }));
+      setFormData((f) => ({ ...f, date: formatToLocalDate(date) }));
     }
 
     setShowCalendar(false);
@@ -294,7 +302,11 @@ const EditTransactionPage = () => {
             <div className="absolute z-10 mt-[-360px] ml-[-4px]">
               <Calendar
                 onChange={handleDateChange}
-                value={formData.date ? new Date(formData.date + "T00:00:00") : new Date()}
+                value={
+                  formData.date
+                    ? new Date(formData.date + "T00:00:00")
+                    : new Date()
+                }
                 activeStartDate={new Date()}
                 className="shadow-lg rounded-lg overflow-hidden"
               />

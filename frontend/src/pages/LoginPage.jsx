@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect,useState } from "react";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import back from "../images/return.png";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +14,6 @@ const LoginPage = () => {
     e.preventDefault();
     navigate("/sign");
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -45,6 +44,7 @@ const LoginPage = () => {
       alert("Error connecting to server: " + error.message);
     }
   };
+  
 
   const backSign = (e) => {
     e.preventDefault();
@@ -52,7 +52,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative w-full h-screen">
+    <div className="relative w-full h-screen"> 
       {/* Form wrapper */}
       <div className="absolute z-10 w-full flex min-h-screen justify-center">
         <div className="text-[16px] leading-[18px]">

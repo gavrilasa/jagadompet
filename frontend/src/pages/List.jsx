@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import Home from './Home';
+import Listo from './HistroyPage';
 import { useNavigate } from "react-router-dom";
 
 const WelcomeinPage = () => {
@@ -17,8 +17,11 @@ const WelcomeinPage = () => {
   }
 
   return (
-    <div className='absolute bg-gradient-to-b from-[#E0FFDE] to-white w-[100dvw] h-[100dvh]'>
-      <Home />
+    <div className='flex justify-center w-full h-full '>
+        <div className='w-[375px] h-[812px] bg-white'>
+            <Listo />
+        </div>
+      
     </div>
   );
 };

@@ -4,6 +4,7 @@ import car2 from "../images/car2.png";
 import car3 from "../images/car3.png";
 import { useNavigate } from "react-router-dom";
 
+
 const Carousel = () => {
   const navigate = useNavigate();
   const images = [car1, car2, car3];
@@ -25,11 +26,11 @@ const Carousel = () => {
     navigate("/sign");
   };
   const handleLogin = (e) => {
-    e.preventDefault();
     navigate("/login");
   };
 
   const [index, setIndex] = useState(0);
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,8 +40,10 @@ const Carousel = () => {
     return () => clearInterval(interval);
   }, [images.length]);
 
+
+
   return (
-    <div className="relative w-full max-w-[375px] mx-auto">
+    <div className="relative w-full max-w-[375px] h-screen mx-auto">
       <div className="overflow-hidden rounded-lg">
         <img
           src={images[index]}

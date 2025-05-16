@@ -110,7 +110,7 @@ const LoginPage = () => {
                 type="checkbox"
                 className="w-[32px] h-[32px] mr-[10px] accent-[#42AB39]"
               />
-              <label className="text-[14px] text-[#000000] font-medium">
+              <label className="text-[14px] text-[#000000] font-medium lg:w-[250px]">
                 By signing up, you agree to the Terms of Service and Privacy
                 Policy
               </label>
