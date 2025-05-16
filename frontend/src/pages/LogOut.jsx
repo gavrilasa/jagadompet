@@ -11,10 +11,11 @@ const LogoutPage = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("user");
-  const [username, setUsername] = useState("");
+
 
 
   const [showPopup, setShowPopup] = useState(false);
+  const [username, setUsername] = useState("");
 
   const handleLogoutClick = () => {
     setShowPopup(true);
