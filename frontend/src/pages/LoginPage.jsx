@@ -2,7 +2,6 @@ import React, { useEffect,useState } from "react";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import back from "../images/return.png";
 import { useNavigate } from "react-router-dom";
-import {apiClient} from "../utils/apiClient";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -10,8 +9,6 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [slowNetwork, setSlowNetwork] = useState(false);
-  const [error, setError] = useState(false);
 
   const handleSign = (e) => {
     e.preventDefault();
@@ -47,48 +44,7 @@ const LoginPage = () => {
       alert("Error connecting to server: " + error.message);
     }
   };
-    useEffect(() => {
-      let isMounted = true;
   
-      (async () => {
-        const { error: err, slowNetwork: isSlow } = await apiClient(
-          "/api/auth/session",
-          // "http://localhost:5000/wrong-url",
-          { method: 'GET' },
-          1000 
-        );
-  
-        if (!isMounted) return;
-        if (!navigator.onLine) {
-        setError(true);
-        setSlowNetwork(false);
-        return;
-      }
-
-      // 2) Else if it timed out, mark slow network
-      if (isSlow) {
-        setSlowNetwork(true);
-        setError(false);
-        return;
-      }
-
-      // 3) Any other fetch error (e.g. CORS, DNS)
-      if (err) {
-        setError(true);
-        setSlowNetwork(false);
-        return;
-      }
-
-      // 4) Otherwise, clear both flags
-      setError(false);
-      setSlowNetwork(false);
-          } 
-      )();
-  
-      return () => {
-        isMounted = false;
-      };
-    }, []);
 
   const backSign = (e) => {
     e.preventDefault();
@@ -96,27 +52,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative w-full h-screen">
-       {/* Slow network warning */}
-        {/* Slow-network modal overlay */}
-      {slowNetwork && (
-        <div className="fixed inset-0 bg-opacity-50 flex h-25 justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 max-w-xs text-center shadow-xl">
-            <p className="text-yellow-800 font-semibold mb-2">
-              ⚠️ Slow Network Detected
-            </p>
-            <p className="text-gray-600 text-sm">
-              Some features may not load optimally until your connection improves.
-            </p>
-          </div>
-        </div>
-      )}
-      {/* Offline error banner (you can style as you like) */}
-      {error && !slowNetwork && (
-        <div className="fixed top-0 text font-bold left-0 w-full h-full flex justify-center items-center bg-[#FA2F34] text-white py-2 text-center z-50">
-          🚫 You appear to be offline or the server is unreachable.
-        </div>
-      )}
+    <div className="relative w-full h-screen"> 
       {/* Form wrapper */}
       <div className="absolute z-10 w-full flex min-h-screen justify-center">
         <div className="text-[16px] leading-[18px]">

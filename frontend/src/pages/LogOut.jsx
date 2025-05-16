@@ -5,15 +5,14 @@ import profile from "../images/pp.png";
 import back from "../images/return.png";
 import { useState } from "react";
 import { useEffect } from "react";
-import { apiClient } from "../utils/apiClient";
+
 
 const LogoutPage = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("user");
   const [username, setUsername] = useState("");
-  const [slowNetwork, setSlowNetwork] = useState(false);
-  const [error, setError] = useState(false);
+
 
   const [showPopup, setShowPopup] = useState(false);
 
@@ -54,69 +53,11 @@ const LogoutPage = () => {
     e.preventDefault();
     navigate("/dash");
   };
-  useEffect(() => {
-        let isMounted = true;
-    
-        (async () => {
-          const { error: err, slowNetwork: isSlow } = await apiClient(
-            "/api/auth/session",
-            // "http://localhost:5000/wrong-url",
-            { method: 'GET' },
-            1000 
-          );
-    
-          if (!isMounted) return;
-          if (!navigator.onLine) {
-          setError(true);
-          setSlowNetwork(false);
-          return;
-        }
-  
-        // 2) Else if it timed out, mark slow network
-        if (isSlow) {
-          setSlowNetwork(true);
-          setError(false);
-          return;
-        }
-  
-        // 3) Any other fetch error (e.g. CORS, DNS)
-        if (err) {
-          setError(true);
-          setSlowNetwork(false);
-          return;
-        }
-  
-        // 4) Otherwise, clear both flags
-        setError(false);
-        setSlowNetwork(false);
-            } 
-        )();
-    
-        return () => {
-          isMounted = false;
-        };
-      }, []);
+
 
   return (
     <div className="relative w-full h-screen">
-      {slowNetwork && (
-        <div className="fixed inset-0 bg-opacity-50 flex h-25 justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 max-w-xs text-center shadow-xl">
-            <p className="text-yellow-800 font-semibold mb-2">
-              ⚠️ Slow Network Detected
-            </p>
-            <p className="text-gray-600 text-sm">
-              Some features may not load optimally until your connection improves.
-            </p>
-          </div>
-        </div>
-      )}
-      {/* Offline error banner (you can style as you like) */}
-      {error && !slowNetwork && (
-        <div className="fixed top-0 text font-bold left-0 w-full h-full flex justify-center items-center bg-[#FA2F34] text-white py-2 text-center z-50">
-          🚫 You appear to be offline or the server is unreachable.
-        </div>
-      )}
+      
       <div className="absolute z-10 w-full flex min-h-screen justify-center ">
         <div>
           {/* Header */}

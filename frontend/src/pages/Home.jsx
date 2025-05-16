@@ -41,7 +41,7 @@ const DashboardPage = () => {
 
   const handleHistory = (e) => {
     e.preventDefault();
-    navigate("/history");
+    navigate("/list");
   };
   const handleProfile = (e) => {
     e.preventDefault();
@@ -142,7 +142,7 @@ const DashboardPage = () => {
     <div>
       <div className="w-full min-h-[1023px]">
         {/* Header */}
-        <div className="w-[375px] h-[64px]  mt-[44px] flex justify-center items-center">
+        <div className="w-[100dvw] h-[64px]  mt-[44px] flex justify-center items-center">
           <div className="w-[337px] h-[40px] flex items-center justify-between">
             <div
               className="w-[38px] h-[38px] bg-gray-300 rounded-full"
@@ -154,13 +154,13 @@ const DashboardPage = () => {
               <div className="w-[24px] h-[24px] flex items-center justify-center mt-[1px]">
                 <img src={down} className="mr-[6px] my-2" alt="down" />
               </div>
-              <p>October</p>
+              <p>May</p>
             </button>
           </div>
         </div>
 
         {/* Remaining Money */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-6 w-[100dvw] items-center flex flex-col">
           <p className="text-gray-500">Your Remaining Money</p>
           <h1 className="text-[40px] font-semibold mt-[9px]">
             {" "}
@@ -169,7 +169,7 @@ const DashboardPage = () => {
         </div>
 
         {/* Income & Expenses */}
-        <div className="flex flex-col">
+        <div className="flex flex-col w-[100dvw] items-center ">
           <div
             className="w-[335px] h-[80px] bg-[#00C153] rounded-[28px] flex items-center mx-[20px]"
             onClick={handleIncome}
@@ -206,7 +206,7 @@ const DashboardPage = () => {
         </div>
 
         {/* Spend Frequency */}
-        <div className="w-[375px] h-[48px] flex items-center mt-[24px]">
+        <div className=" justify-center w-[100dvw] h-[48px] flex items-center mt-[24px]">
           <p className="pl-[20px] font-semibold text-[18px] leading-[100%]">
             Spend Frequency
           </p>
@@ -223,7 +223,7 @@ const DashboardPage = () => {
           </div>
         </div>
         {/* Recent Transaction Header */}
-        <div className="w-[375px] h-[48px] items-center flex mt-[24px] mb-3">
+        <div className="w-[100dvw] justify-center h-[48px] items-center flex mt-[24px] mb-3">
           <p className="pl-[20px] font-semibold text-[18px] leading-[100%]">
             Recent Transaction
           </p>
@@ -236,7 +236,7 @@ const DashboardPage = () => {
         </div>
 
         {/* Transaction List */}
-        <div className="flex flex-col gap-[6px]" onClick={handleHistory}>
+        <div className="flex flex-col gap-[6px] items-center justify-center" onClick={handleHistory}>
           {loading && <p className="text-center">Loading transactions...</p>}
           {error && <p className="text-center text-red-500">{error}</p>}
           {!loading && !error && transactions.length === 0 && (

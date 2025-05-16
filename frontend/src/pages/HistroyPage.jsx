@@ -93,7 +93,7 @@ const History = () => {
       return (
         <div
           key={item.transaction_id}
-          className="flex items-center justify-between bg-[#FCFCFC] p-4 rounded-[24px] w-[335px] h-[89px] mx-[20px] mb-[6px] cursor-pointer"
+          className="flex items-center justify-between bg-[#FCFCFC]  p-4 rounded-[24px] w-[335px] h-[89px] mx-[20px] mb-[6px] cursor-pointer"
           onClick={() => handleItemClick({ ...item, icon, bgColor, textColor, label })}
         >
           <div className="flex items-center gap-3">
@@ -139,9 +139,9 @@ const History = () => {
   if (!token) return null;
 
   return (
-    <div className="w-full max-w-[375px]  h-full max-h-[812px] my-auto">
+    <div className="w-[100dvw] h-[100dvh] max-h-[812px]">
       {/* Header */}
-      <div className="w-[375px] h-[64px] mt-[44px] flex items-center relative">
+      <div className="w-[100dvw] h-[64px] mt-[44px] flex relative">
         <div className="w-[337px] h-[40px] flex items-center justify-between mx-[20px]">
           <span
             className="absolute left-[20px] flex items-center justify-center"
@@ -156,7 +156,7 @@ const History = () => {
               <div className="w-[24px] h-[24px] flex items-center justify-center mt-[1px]">
                 <img src={down} className="mr-[6px] my-2" alt="Month" />
               </div>
-              <p>October</p>
+              <p>May</p>
             </button>
           </span>
         </div>
@@ -165,7 +165,7 @@ const History = () => {
       {/* Sections */}
       {labels.map((label) => (
         <React.Fragment key={label}>
-          <div className=" mt-[20px] mx-[20px]">
+          <div className=" mt-[20px] ml-[20px] flex">
             <p className="font-semibold text-[18px] mb-[8px]">{label}</p>
           </div>
           <div className="flex flex-col">{renderTransactionsByDay(label)}</div>
