@@ -179,10 +179,10 @@ const EditTransactionPage = () => {
       ...selectedTransaction,
       ...updatedFields,
     };
-
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
     try {
       const res = await fetch(
-        `http://localhost:5000/api/transactions/${selectedTransaction.transaction_id}`,
+        `${API_BASE_URL}/api/transactions/${selectedTransaction.transaction_id}`,
         {
           method: "PUT",
           headers: {
