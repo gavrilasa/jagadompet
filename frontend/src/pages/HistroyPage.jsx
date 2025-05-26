@@ -11,6 +11,7 @@ const History = () => {
   const [transactions, setTransactions] = useState([]);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const token = localStorage.getItem("token");
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     if (!token) {
@@ -33,7 +34,7 @@ const History = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/transactions/${selectedTransaction.transaction_id}`,
+        `${API_BASE_URL}/api/transactions/${selectedTransaction.transaction_id}`,
         {
           method: "DELETE",
           headers: {
